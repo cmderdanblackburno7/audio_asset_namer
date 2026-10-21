@@ -1,0 +1,62 @@
+# Python caches and test output
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage*
+htmlcov/
+.tox/
+.nox/
+*.egg-info/
+.eggs/
+
+# Local interpreters and environments
+.build-venv/
+.venv/
+venv/
+env/
+ENV/
+.python-version
+
+# Build/release artefacts (publish binaries through GitHub Releases)
+build/
+dist/
+*.exe
+*.dll
+*.pyd
+*.so
+*.zip
+*.pkg
+*.toc
+*.manifest
+# This hand-maintained build recipe IS source and must remain visible.
+!audio_asset_namer.spec
+
+# Credentials, local configuration and editor settings
+.env
+.env.*
+!.env.example
+.pypirc
+*.pem
+*.key
+*.pfx
+*.p12
+.vscode/
+.idea/
+
+# Temporary files, logs, local test fixtures and user audio/scripts
+*.log
+*.tmp
+*.temp
+*.bak
+*.swp
+~$*
+.audio-namer-test-*/
+.audit-snapshot-*/
+*.mp3
+*.wav
+Named/
+Thumbs.db
+Desktop.ini
+.DS_Store
