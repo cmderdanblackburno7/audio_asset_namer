@@ -28,6 +28,35 @@ def sha256(path):
         return hashlib.file_digest(stream, "sha256").hexdigest()
 
 
+
+def source_state():
+    """Record local provenance without fetching or changing Git state."""
+    try:
+        commit = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=TOOL, text=True, stderr=subprocess.DEVNULL).strip()
+        dirty = bool(subprocess.check_output(["git", "status", "--porcelain"], cwd=TOOL, text=True).strip())
+        return {"commit": commit, "dirty": dirty}
+    except (OSError, subprocess.CalledProcessError):
+        return {"commit": None, "dirty": None}
+
+
+def verify_checksums(checksum_file):
+    for line in checksum_file.read_text(encoding="ascii").splitlines():
+        if not line or line.startswith("#"):
+            continue
+        expected, name = line.split("  ", 1)
+        if Path(name).name != name or sha256(checksum_file.parent / name) != expected:
+            raise ValueError(f"Release checksum mismatch: {name}")
+
+
+def write_checksums(paths, checksum_file):
+    lines = ["# SHA-256 checksums for the final release files.",
+             "# In PowerShell: Get-FileHash .\\<filename> -Algorithm SHA256",
+             "# Compare all 64 hexadecimal characters with the matching line below."]
+    lines.extend(f"{sha256(path)}  {path.name}" for path in paths)
+    checksum_file.write_text("\n".join(lines) + "\n", encoding="ascii")
+    verify_checksums(checksum_file)
+
+
 def verify_executable(executable, python):
     # IMAGE_SUBSYSTEM_WINDOWS_GUI = 2: no console window for normal startup.
     with executable.open("rb") as stream:
@@ -58,6 +87,7 @@ def build(skip_install=False, gui_smoke=False):
         raise ValueError("Build on 64-bit Windows with a 64-bit Python interpreter (3.12 recommended).")
     if sys.version_info < (3, 11):
         raise ValueError("The build script needs Python 3.11+ (3.12 recommended); the source app supports 3.10+.")
+    provenance = source_state()
     BUILD.mkdir(exist_ok=True)
     DIST.mkdir(exist_ok=True)
     python = ENVIRONMENT / "Scripts" / "python.exe"
@@ -72,6 +102,7 @@ def build(skip_install=False, gui_smoke=False):
     if not test.is_file():
         raise ValueError(f"Regression suite is required before building: {test}")
     run(python, test, *(["--gui-smoke"] if gui_smoke else []))
+    run(python, TOOL / "tests" / "release_packaging_regression.py")
     environment = os.environ.copy()
     environment["PYINSTALLER_CONFIG_DIR"] = str(BUILD / "pyinstaller-cache")
     run(python, "-m", "PyInstaller", "--clean", "--noconfirm", "--distpath", DIST,
@@ -95,8 +126,9 @@ def build(skip_install=False, gui_smoke=False):
             raise ValueError("Release ZIP validation failed")
         if hashlib.sha256(release.read(EXE_NAME)).hexdigest() != sha256(executable):
             raise ValueError("Release ZIP executable checksum mismatch")
+    write_checksums((executable, archive), DIST / "SHA256SUMS.txt")
     packages = subprocess.check_output([str(python), "-m", "pip", "freeze"], text=True).splitlines()
-    report = {"version": VERSION, "python": sys.version, "build_packages": packages,
+    report = {"version": VERSION, "python": sys.version, "build_packages": packages, "source": provenance,
               "artifacts": [{"filename": path.name, "bytes": path.stat().st_size, "sha256": sha256(path)}
                             for path in (executable, archive)],
               "automated_checks": "source regressions, PE x64 GUI subsystem, archive contents, release ZIP integrity",

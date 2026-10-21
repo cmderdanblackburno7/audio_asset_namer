@@ -41,3 +41,12 @@ and the bundled third-party notices for the applicable terms.
 Website: https://binaurawave.com/
 Create Audio Sessions: https://binaurawave.com/binaurawave_app/
 Help & Support: https://binaurawave.com/feedback/
+
+Official source and downloads:
+https://github.com/cmderdanblackburno7/audio_asset_namer/releases
+Verify downloads with the release's SHA256SUMS.txt, for example in PowerShell:
+Get-FileHash .\BinauraWave-Audio-Asset-Namer.exe -Algorithm SHA256
+Compare all 64 hexadecimal characters with the matching filename's checksum.
+Checksums detect changes when obtained from a trusted release; they are not
+code signatures or antivirus guarantees. Do not disable Windows protections.
+Report bugs with synthetic examples; do not share personal audio or scripts.

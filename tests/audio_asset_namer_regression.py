@@ -364,14 +364,16 @@ def gui_smoke():
             ui.editor.event_generate("<Tab>")
             root.update()
             assert root.focus_get() != ui.editor  # Theme must not trap normal traversal.
-            assert str(ui.link_buttons["GitHub"]["state"]) == "disabled"
+            assert str(ui.link_buttons["GitHub"]["state"]) == "normal"
+            assert app.GITHUB_URL == "https://github.com/cmderdanblackburno7/audio_asset_namer"
             with patch.object(app.webbrowser, "open", return_value=True) as browser:
                 for label, url in app.FOOTER_LINKS:
                     ui.link_buttons[label].invoke()
                     browser.assert_called_with(url, new=2)
                 assert browser.call_count == 3
                 ui.link_buttons["GitHub"].invoke()
-                assert browser.call_count == 3
+                browser.assert_called_with(app.GITHUB_URL, new=2)
+                assert browser.call_count == 4
             with patch.object(app.messagebox, "showinfo") as about:
                 ui.about_button.invoke()
                 text = about.call_args.args[1]

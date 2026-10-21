@@ -7,7 +7,7 @@ import re
 import shutil
 from titles import suggest_title, suggest_titles
 
-VERSION = "1.2.5"
+VERSION = "1.2.6"
 PREFIX = re.compile(r"^(\d+)(?=[. _-])", re.ASCII)
 PAUSE = re.compile(r"\[pause\]", re.IGNORECASE)
 UNSAFE = re.compile(r'[<>:"/\\|?*\x00-\x1f\x7f]')

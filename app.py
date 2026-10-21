@@ -15,8 +15,8 @@ FOOTER_LINKS = (
     ("Create Audio Sessions", WEBSITE + "binaurawave_app/"),
     ("Help & Support", WEBSITE + "feedback/"),
 )
-# Set only after the separate public utility repository exists. No placeholder URL.
-GITHUB_URL = None
+# Verified public repository; opened only on an explicit footer click.
+GITHUB_URL = "https://github.com/cmderdanblackburno7/audio_asset_namer"
 LOCAL_FILES_NOTE = ("Organise and name your audio clips locally. No account required. "
                     "Your audio files and scripts remain on your computer.")
 

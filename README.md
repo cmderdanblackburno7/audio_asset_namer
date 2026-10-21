@@ -2,7 +2,7 @@
 
 A free, offline Windows desktop utility for turning numbered Audacity MP3 exports into descriptive, editable filenames. Pair your clips with a UTF-8 script, review the suggested titles, and copy the named audio into a fresh folder with a CSV manifest.
 
-**Current source version: 1.2.5.** Original utility code is MIT-licensed; BinauraWave artwork and trademark rights are reserved separately.
+**Current source version: 1.2.6.** Original utility code is MIT-licensed; BinauraWave artwork and trademark rights are reserved separately.
 
 ![Dark interface showing a sample naming preview](screenshots/dark-theme.jpg)
 
@@ -25,7 +25,9 @@ No account, API key, paid service, telemetry, automatic splitting, transcription
 
 ### Windows executable
 
-When a release has been published, download the Windows x64 ZIP from **this repository's GitHub Releases page**, extract it and double-click `BinauraWave-Audio-Asset-Namer.exe`. No Python, pip, Tkinter installation or administrator privileges are required. No release URL is assumed or invented here.
+Download the Windows x64 ZIP from the [official GitHub Releases page](https://github.com/cmderdanblackburno7/audio_asset_namer/releases) when a release is available, extract it and double-click `BinauraWave-Audio-Asset-Namer.exe`. No Python, pip, Tkinter installation or administrator privileges are required. Keep the ZIP's licence/branding/third-party notices with the application when redistributing it.
+
+The current executable is unsigned. Windows SmartScreen may show an unrecognised-app warning because a new unsigned publisher has little reputation. Do not bypass warnings for an unexpected download: check the official repository, release filename and checksum, or wait for a signed release. A checksum is an integrity check, not a code signature or a guarantee that antivirus products will trust the file.
 
 The executable can run from an ordinary folder such as Desktop or Downloads. Its runtime extracts temporarily into Windows temp; user audio/CSV output goes only into `Named` beneath the audio folder you choose. The utility does not rely on another BinauraWave application, repository, website connection or development directory.
 
@@ -38,6 +40,16 @@ python app.py
 ```
 
 On Windows, `launch.bat` also works with a usable Python launcher or PATH installation. No `pip install` is needed to run the source app. Keep `favicon.ico`, `assets/logo.png` and the Python modules together; asset paths resolve relative to the application, not the working directory. Missing branding artwork falls back gracefully.
+
+## Verify your download
+
+Download `SHA256SUMS.txt` from the same official release as the ZIP. In Windows PowerShell, from the download folder:
+
+```powershell
+Get-FileHash .\BinauraWave-Audio-Asset-Namer-1.2.6-Windows-x64.zip -Algorithm SHA256
+```
+
+Compare **all 64 hexadecimal characters** in the output with the matching ZIP line in `SHA256SUMS.txt` (letter case does not matter). Stop if they differ and obtain a fresh copy from the official release. After extraction, you can also run `Get-FileHash .\BinauraWave-Audio-Asset-Namer.exe -Algorithm SHA256` and compare the EXE line. Checksums are calculated from the final files and reverified by the build; they detect corruption/changes when the checksum source is trusted.
 
 ## Usage
 
@@ -66,7 +78,7 @@ The CSV columns are:
 | `cleaned_spoken_text` | Paragraph with `[pause]` removed and whitespace normalised |
 | `track_number` | Original numeric export sequence, for example `01` becomes `1` |
 
-The script's UTF-8 BOM and paragraph separators are structural; paragraph contents are preserved. Inputs are checked again before export. Very long Windows paths may require a shorter location. No files are uploaded. Do not include personal scripts, audio or manifests in bug reports without reviewing their contents.
+The script's UTF-8 BOM and paragraph separators are structural; paragraph contents are preserved. Inputs are checked again before export. Very long Windows paths may require a shorter location. No files are uploaded. Do not include personal scripts, audio or manifests in bug reports without reviewing their contents. CSV preserves supplied text faithfully: import its columns as text when using a spreadsheet application, which could otherwise interpret formula-like text.
 
 ## Build a Windows executable
 
@@ -78,7 +90,7 @@ py -3.12 build_windows.py --gui-smoke
 
 Or double-click `build_windows.bat`. The script creates an ignored `.build-venv`, installs the exact build-only dependencies in `requirements-build.txt`, runs this checkout's tests, and builds with PyInstaller's one-file/windowed spec. Initial dependency installation needs package-index access. `--skip-install` reuses an already prepared environment; `--gui-smoke` needs an interactive desktop and can be omitted for regular tests.
 
-Outputs go to ignored `dist/`: the executable, short README, versioned Windows-x64 ZIP and build/checksum report. The ZIP includes source/branding licence notices and collected Python/Tcl/Tk/build-package notices. The source app has no additional runtime pip dependencies. `build/` holds temporary build data. No development fixtures, source audio, private application files or copied virtual environment are bundled.
+Outputs go to ignored `dist/`: the executable, short README, versioned Windows-x64 ZIP and build/checksum report plus `SHA256SUMS.txt`. The ZIP includes source/branding licence notices and collected Python/Tcl/Tk/build-package notices. The build report also records the source commit and whether the source tree was dirty. A final release must be built from a clean reviewed commit. The source app has no additional runtime pip dependencies. `build/` holds temporary build data. No development fixtures, source audio, private application files or copied virtual environment are bundled.
 
 Review [third-party requirements](THIRD_PARTY_NOTICES.md) and the [release test checklist](PACKAGING_TESTS.md) before publication. Compiled executables and ZIPs belong in **GitHub Releases**, never source commits. Build/publishing/signing are separate steps; these scripts do not push, upload or change Git remotes.
 
@@ -87,6 +99,7 @@ Review [third-party requirements](THIRD_PARTY_NOTICES.md) and the [release test 
 ```powershell
 python tests/audio_asset_namer_regression.py
 python tests/audio_asset_namer_regression.py --gui-smoke
+python tests/release_packaging_regression.py
 ```
 
 Tests and fixtures are included here and need no other repository, credentials, network service, real audio collection or paid API. Dummy audio bytes are sufficient to verify byte-copy behavior. The optional GUI smoke checks actual Tk controls, editing/export, contrast, keyboard traversal, layout, assets and native Windows branding.
@@ -96,8 +109,9 @@ Tests and fixtures are included here and need no other repository, credentials, 
 - [BinauraWave](https://binaurawave.com/)
 - [Create Audio Sessions](https://binaurawave.com/binaurawave_app/)
 - [Help & Support](https://binaurawave.com/feedback/)
+- [GitHub source and issues](https://github.com/cmderdanblackburno7/audio_asset_namer)
 
-These links are optional; the naming workflow is fully offline. The app's GitHub link remains disabled until a real public repository exists. When reporting a problem, include the application version, Windows/Python version if applicable, error text and a small anonymised example.
+All four footer links are optional and open only when clicked; they cause no startup requests. Report ordinary bugs through [GitHub Issues](https://github.com/cmderdanblackburno7/audio_asset_namer/issues), with the version, Windows version, redacted error text and a tiny synthetic example. For security concerns, see [SECURITY.md](SECURITY.md) and contact support before posting sensitive details publicly. Do not send personal audio, full scripts, passwords, API keys or unredacted local file paths.
 
 ## Licence, branding and limitations
 

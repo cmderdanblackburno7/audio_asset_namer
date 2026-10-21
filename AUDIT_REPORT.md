@@ -21,10 +21,10 @@ Reviewed the standalone project only. No commercial application files are includ
 
 ## Git review boundary
 
-The copied repository originally had one unpublished commit containing generated environment files, developer paths and personal author metadata. The user explicitly authorised replacing that initial commit with the cleaned source-only tree. The replacement uses the public identity `BinauraWave` with no personal email; no remotes are configured or changed and no push/publication occurs.
+The copied repository originally had one unpublished commit containing generated environment files, developer paths and personal author metadata. The user explicitly authorised replacing that initial commit with the cleaned source-only tree. The replacement uses the public identity `BinauraWave` with no personal email; no remotes were configured or changed by that source-preparation task. The owner subsequently published the repository; the final release audit does not change remotes or publish binaries.
 
 Normal Git recovery metadata may retain the superseded object locally; it is not reachable from the replacement branch history and is not part of a normal source checkout or push. Do not distribute the raw local `.git` directory or ignored build/environment folders as a source archive. Review the committed tree and history before any future publication.
 
 ## Remaining release checks
 
-This is ready for source/public review, not a published binary release. Windows 10/clean-machine executable checks, live default-browser checks, signing decisions and exact runtime/DLL licence review belong to the release checklist in `PACKAGING_TESTS.md`. No public GitHub repository URL is invented; the app's GitHub button remains disabled until one actually exists.
+This is ready for source/public review, not a published binary release. Windows 10/clean-machine executable checks, live default-browser checks, signing decisions and exact runtime/DLL licence review belong to the release checklist in `PACKAGING_TESTS.md`. The owner subsequently published the verified repository at https://github.com/cmderdanblackburno7/audio_asset_namer; version 1.2.6 enables that optional footer link. See RELEASE_READINESS.md for final binary evidence and remaining checks.
