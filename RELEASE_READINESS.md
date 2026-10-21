@@ -1,64 +1,66 @@
-# Release readiness — 2026-10-21
+# Release readiness — 2026-10-22
 
-**MANUAL CHECK REQUIRED — retain these files as release candidates; do not publish them yet.** Packaging and local acceptance passed. The bundled runtime needs security/provenance review and a clean-PC check before a public binary release.
+**READY for a first public release based on the checks performed.** No confirmed applicable security or redistribution-licensing blocker remains from the investigated issues. This is a bounded assessment of the reviewed application and exact artifacts, not an absolute security or antivirus guarantee. A quick Windows 10 spot check of the rebuilt files is recommended; it has not been marked as passed.
 
-## Build identity and files
+## Final artifact identity
 
-- Version: **1.2.6**. Enabling the verified public GitHub footer link is the only application behaviour change; naming, validation, copying and CSV logic are unchanged.
-- Built from clean local source commit **`15409dfe893d02618836c3b3353d0391a20b6455`** (`dirty: false` recorded before building). This report was written after the build; it is not embedded in the EXE.
-- Fresh isolated build environment; Windows 11 x64, Python 3.12.14, Tcl/Tk 8.6.12, PyInstaller 6.22.3. Existing one-file/windowed spec, pinned packages and notice collector reused.
-- Location: this checkout's ignored `dist/`. **Unsigned**, confirmed with `Get-AuthenticodeSignature` (`NotSigned`). No publication, tags, pushes, remote or visibility changes were made.
+Version remains **1.2.6**. Application/UI/processing source is unchanged. Only packaging, dependency review, release checks and documentation changed.
 
-| Final artifact | Bytes | SHA-256 |
+Built from clean local commit **`2ba1883da8fb3a868675ffd875cc61bddc4b0b2c`** (`dirty: false`). Later UTF-8 documentation housekeeping and this report do not change the binaries. Windows x64, official PSF Python **3.13.17**, OpenSSL **3.5.9**, Tcl/Tk **8.6.15**, PyInstaller **6.22.3**. Outputs are in ignored `dist/`.
+
+| File | Bytes | SHA-256 |
 | --- | ---: | --- |
-| `BinauraWave-Audio-Asset-Namer.exe` | 11,881,328 | `86d5dfa7ded009cdfdae72e7689bff6524abc6607c7ad51c635a01315cb22a7a` |
-| `BinauraWave-Audio-Asset-Namer-1.2.6-Windows-x64.zip` | 11,668,796 | `062edf0d2f3f51c75605484a63c86fc7d4e503d413f227c1d7ed393c5e20dd7c` |
+| `BinauraWave-Audio-Asset-Namer.exe` | 10,870,788 | `28b49b4ad330b2f2712532c4e6a61abf2174285b0aa4fe4d302e9053bead1760` |
+| `BinauraWave-Audio-Asset-Namer-1.2.6-Windows-x64.zip` | 10,710,717 | `8e98bca0604415a33cc9d20facba4cb64dd6d0d0b27701a66926a77fe9f22916` |
 
-`SHA256SUMS.txt` contains both final hashes; both were recalculated and verified after packaging. ZIP CRC/member checks passed; its embedded EXE matches the standalone EXE. `build-info.json` retains build versions and source provenance. README documents PowerShell `Get-FileHash` verification. Hashes establish integrity against a trusted checksum, not publisher identity or antivirus approval.
+`SHA256SUMS.txt` contains these final hashes. Both were recomputed after packaging/acceptance; ZIP CRC/member checks passed and its EXE is identical to the standalone file. The ZIP contains **42 members**, including legal/provenance notices. These files supersede the previous 1.2.6 EXE hash `86d5dfa7ded009cdfdae72e7689bff6524abc6607c7ad51c635a01315cb22a7a`. Preserved old artifacts under ignored `build/previous-release-20261021/` are not release uploads.
 
-## Performed checks
+## Security investigations and fixes
 
-| Check | Result and scope |
+Full evidence, upstream references, component-use table and advisory applicability are in [RUNTIME_SECURITY.md](RUNTIME_SECURITY.md).
+
+- **Custom/outdated runtime replaced.** The official PSF full-runtime ZIP matched Python.org's manifest SHA-256; `python313.dll` has a valid Python Software Foundation signature. The refreshed runtime incorporates the Python/OpenSSL security fixes missing from the previous candidate.
+- **Native origins established.** The PSF SBOM and exact Windows build declarations establish libffi 3.4.4, bzip2 1.0.8, mpdecimal 4.0.0, zlib 1.3.1, Tcl/Tk 8.6.15 and OpenSSL 3.5.9. All **16 DLL/PYD files actually bundled** match hashes from the verified PSF ZIP. The windowed bootloader and both runtime hooks also match the hash-verified official PyInstaller wheel. Build checks reject stale environments, altered/unknown native files and reintroduced `_lzma`.
+- **Unused XZ decoder removed.** XZ 5.2.5 has version-applicable index/decoder advisories, but the app provides no archive decoder flow. Excluding `lzma`/`_lzma` removes that code from the EXE instead of shipping it based only on an unreachability assumption. No ad hoc DLL replacement was used.
+- **Developer PATH contamination fixed.** The strengthened check initially rejected Microsoft compatibility DLLs collected from an unrelated developer-tool folder. PyInstaller now uses a restricted runtime/Windows PATH and no Python/Tcl path overrides. The final bundle contains neither those foreign API-set/UCRT copies nor XZ.
+- **Remaining advisories assessed by actual API use.** zlib 1.3.1 is version-affected by CVE-2026-27171, but the fault requires a negative length to `crc32_combine*`. Exact Python/Tcl bindings and PyInstaller extraction code have no such calls; this API is not exposed through reviewed flows. MP3s remain opaque bytes, scripts are UTF-8 text, and there is no SSL server, certificate/key processing, urllib authentication, archive extraction or input-controlled FFI. No applicable Tcl/Tk/libffi/bzip2/mpdecimal issue was identified in the bounded review. Dormant libraries are not equated with reachable vulnerabilities.
+- **Build dependencies checked.** OSV on 2026-10-22 returned no advisories for all seven exact pinned build packages. PyInstaller 6.22.3 is newer than the fix for GHSA-9fxf-4qw3-ghmr. This is not a substitute for the separate native review.
+
+## Licensing status
+
+**Reviewed redistribution requirements addressed for this exact bundle.** The existing collector retains original-code MIT terms, reserved BinauraWave branding, the complete actual interpreter licence (Microsoft/bzip2 conditions included), matching Tcl/Tk/libtommath, OpenSSL/AUTHORS, libffi, zlib, mpdecimal, HACL* and incorporated-Python-code terms, plus build-tool notices. Exact sources and native hashes are in `licenses/README.md` and `licenses/runtime-provenance.json`. XZ's historical notice does not imply it is still bundled. SBOM `NOASSERTION` fields were not treated as permission; actual upstream licence texts were reviewed and retained. No original-code or branding licence scope changed.
+
+## Tests and observed results
+
+| Check | Result / scope |
 | --- | --- |
-| Application regressions | **PASS: 24 tests**, including ordering/counts, titles, duplicates, stale inputs, byte copies, CSV, failures, assets and packaging configuration. |
-| Release regressions | **PASS: 3 tests** for final checksum verification/tampering, path escape rejection and absent-Git provenance fallback. |
-| Source GUI smoke | **PASS**, actual Tk/Windows icon handles and DWM readback, contrast, Tab focus, About, load/edit/copy/results and four client sizes (1100×820, 1500×800, 1200×680, 800×650). Layouts fit typical 1600×900/1366×768 displays; high DPI remains a manual check. Four link targets verified with mocked browser dispatch; startup performs no browser navigation. |
-| EXE packaging | **PASS**, AMD64 PE GUI subsystem 2, `asInvoker` manifest, embedded icon plus bundled favicon/logo/Python/Tk. No unwanted console appeared during normal startup. UPX disabled. |
-| Packaged startup | **PASS**, both final dist EXE and ZIP-extracted EXE launched/exited successfully with System32-only PATH and Python/Tcl/Tk environment variables removed. Direct EXE used an unrelated working directory. This is still a developer PC, not proof of a clean installation. |
-| Packaged workflow | **PASS**, native folder/script pickers; numeric matching; unnumbered file ignored; descriptive preview; manual edits updated title-only filenames; case-insensitive `Calm`/`calm` duplicate rejected; corrected `Calm.mp3`/`Rest.mp3` export succeeded with per-file results and CSV. |
-| Packaged data preservation | **PASS**, post-export hashes confirm exact source bytes copied, both original numbered fixtures, unrelated fixture and script unchanged; CSV retains titles, category, original/cleaned paragraphs and track numbers 1/2. Retrying into existing `Named` was refused and original exports remained intact. Synthetic MP3-labelled bytes were used; decoding/playback was not tested or required by this byte-copy utility. |
-| Packaged links/About | **PASS**, four footer clicks opened default Chrome pages with the expected repository, website, session studio and feedback titles. About shows 1.2.6. This checks browser dispatch, not all website features or alternate browser associations. |
-| Output locations | **PASS within observed scope**, audio/CSV appeared only in the chosen fixture folder's `Named`; unrelated startup working directory stayed empty. No user output beside the EXE or in bundled assets. One-file extraction uses normal Windows temp. No system-wide filesystem/network trace was performed. |
-| Source/bundle audit | **PASS within reviewed scope**, tracked-text secret/private-home-path pattern scan found no matches; no audio, executables, archives or environments tracked. Actual EXE/PYZ inventory contains standard runtime/app modules, no private app, tests or build-tool modules. App bytecode filenames are relative and contain no developer home paths. No credentials, telemetry, API calls or startup network code found. |
+| Application regressions | **PASS: 24 tests** under the refreshed runtime. |
+| Release regressions | **PASS: 5 tests**, including checksum tampering/path checks, absent-Git fallback, changed native binary and stale-runtime rejection. |
+| Source GUI smoke | **PASS**, contrast, focus, icon/DWM readback, four layouts, load/edit/export/results, About and all four mocked browser targets. |
+| Refreshed ZIP workflow | **PASS on Windows 11**, 10 synthetic MP3-labelled byte fixtures matched; unrelated MP3 ignored; title manually edited to `Calm Breathing`; all 10 title-only exports and CSV succeeded. Every output matched original bytes, all original/script hashes remained unchanged, and CSV preserved original/cleaned text, category and track numbers 1–10. These were byte-copy fixtures, not an audio playback test. |
+| Independent startup | **PASS**, both ZIP-extracted and direct final EXE, System32-only PATH, no Python/Tcl/Tk environment settings. Direct EXE used an unrelated working folder, which remained empty. GUI subsystem/no console, local logo/icon and dark title bar observed. Test process token was not elevated; EXE manifest is `asInvoker`. |
+| New EXE links | **PASS**, live GitHub footer dispatch opened the expected Chrome repository page. All four target callbacks passed source smoke; other three links were not re-clicked in the refreshed EXE. Previous artifact's four live links/native pickers were checked on 2026-10-21. |
+| Separate Windows 10 laptop | **Owner-reported PASS**, previous 1.2.6 artifact processed 10 real MP3s with title editing and CSV creation. This is useful independent compatibility evidence, not a claim that the newly rebuilt hash has been tested there. No unreported details such as Python absence or offline conditions are assumed. |
+| Native/archive integrity | **PASS**, all 16 native files matched PSF hashes; XZ/foreign compatibility DLLs absent; final notices/ZIP members/checksums verified. Expected optional POSIX, excluded-LZMA and collections alias analysis warnings produced no observed runtime failure. |
 
-Local supporting evidence is ignored under `build/security/` and `build/acceptance-1.2.6/`; it is not release content. Expected PyInstaller warnings concern conditional POSIX/importlib modules; no missing asset or runtime error was observed.
+Application source files `app.py`, `core.py`, `titles.py`, `theme.py` and `windows_branding.py` are byte-for-byte unchanged from the previously reviewed source. No new accounts, APIs, runtime network requests, telemetry, input mutations or private application dependency was introduced. Local supporting evidence is ignored under `build/security-2026-10-22/` and `build/acceptance-runtime-refresh/`; it is not uploaded or bundled.
 
-## Security and licence findings
+## Remaining limitations and recommendation
 
-- **Build pins:** OSV query on 2026-10-21 returned no advisories for PyInstaller 6.22.3, hooks-contrib 2026.9, altgraph 0.17.5, packaging 26.3, pefile 2024.8.26, pywin32-ctypes 0.2.3 and setuptools 84.2.1. This is a database snapshot, not a comprehensive native-runtime scan. [PyInstaller GHSA-9fxf-4qw3-ghmr](https://github.com/pyinstaller/pyinstaller/security/advisories/GHSA-9fxf-4qw3-ghmr) affects versions before 6.22.1; this build uses a patched version and requests no elevation.
-- **Runtime review required:** bundled Python **3.12.14** predates [3.12.15's security fixes](https://www.python.org/downloads/release/python-31215/). Bundled OpenSSL/libcrypto **3.5.8** predates [3.5.9's security fixes](https://www.openssl-library.org/news/openssl-3.5-notes/), including [CVE-2026-35189](https://www.openssl-library.org/news/vulnerabilities-3.5/index.html) affecting versions before 3.5.9. The app does not offer SSL/certificate/archive processing and only opens fixed URLs in a separate browser; that is an initial reachability observation, not a complete proof that all affected code is unreachable. Prefer a reviewed, updated runtime and rebuild; otherwise document a maintainer-reviewed applicability decision before publication. No runtime DLLs were replaced ad hoc.
-- **Runtime inventory:** Python/Tcl/Tk, VCRUNTIME140/UCRT/API-set DLLs, libcrypto/libffi and the `_bz2`, `_ctypes`, `_decimal`, `_hashlib`, `_lzma`, `_queue`, `_socket`, `_tkinter`, `select` and `unicodedata` extensions. Reported zlib is 1.3.2 and libmpdec 2.5.1. Exact libffi/liblzma build versions were not established; Tcl/Tk 8.6.12 also requires currency review. Do not interpret the Python-package OSV result as clearance of these native components.
-- **Licence status: provisional pending runtime provenance.** Final ZIP has 38 members including original-code MIT terms, reserved BinauraWave branding, complete actual interpreter licence (including Microsoft/bzip2 terms), Tcl/Tk terms, installed build-package notices and added OpenSSL/AUTHORS, zlib and libmpdec notices. Baseline libffi/liblzma notices are included, but their exact build provenance/terms must be confirmed. See `licenses/README.md` and `THIRD_PARTY_NOTICES.md`. The [PyInstaller bundling exception](https://pyinstaller.org/en/stable/license.html) permits the application's chosen licence subject to dependency terms; third-party code and artwork are not relicensed under MIT.
-- **Trust/limitations:** unsigned one-file applications may trigger SmartScreen or antivirus heuristics. Existing windowed bootloader, official local icon, no UPX/obfuscation, no installer/admin requirement and restrained bundle reduce avoidable surprises; no antivirus scan, signing, malware-free certification or universal trust claim is made. Preserve Windows protections. CSV faithfully retains supplied text; import as text in spreadsheets. Input-stat checks are not adversarial locking, and very large/untrusted scripts can consume resources.
+- **No further confirmed security fix is outstanding** from this investigation. Recommend a quick repeat on the Windows 10 laptop using the **new ZIP/checksum**, since the runtime and artifact hashes changed. That retest is unperformed here; it is a compatibility precaution, not a demonstrated vulnerability.
+- The finished EXE remains **unsigned** (`Get-AuthenticodeSignature`: `NotSigned`). SmartScreen/reputation or antivirus warnings remain possible. Signing is optional; no antivirus approval, independent penetration test, fuzzing or system-wide filesystem/network trace is claimed. Signing later requires regenerating the ZIP and both hashes.
+- Owner-reported light title bar until focus is accepted as **cosmetic and non-blocking**; native title-bar code was not changed. High-DPI, alternate browser and taskbar/shortcut variations remain normal QA limitations.
+- Faithful CSV text may be interpreted as formulas by spreadsheets: import as text. Very large/untrusted scripts may exhaust resources; stale-input stat checks are not adversarial locks. This assessment does not cover a local attacker who can replace the EXE/resources or unknown/future advisories.
 
-## Required manual work before publication
+## Release handoff and housekeeping
 
-1. Resolve the Python/OpenSSL security review, exact libffi/liblzma provenance and runtime/Tcl/Tk currency. If the runtime changes, review matching notices, rebuild, repeat acceptance and regenerate this report/checksums.
-2. Test the final candidate on another clean Windows machine without Python, as a normal user, from actual Downloads/Desktop. Repeat native selection, preview/edit/export with disposable real MP3s; compare hashes/CSV; confirm offline operation. Developer-PC tests above are not marked as clean-PC passes.
-3. Check Windows 10 if it will be supported, high DPI/text scaling, taskbar/shortcut icons, minimising/maximising/remapping and alternate default browsers. Main-window icon/dark title bar were observed on this Windows 11 machine; unsupported systems may retain OS-native styling.
-4. Decide whether to sign. If signing changes the EXE, rebuild the ZIP and recompute both checksums. Review actual SmartScreen/antivirus results without bypassing protections. Publish the reviewed source commit only through a separately authorised push/tag/release step.
+When the owner chooses to publish, attach exactly:
 
-## Exact eventual release upload set
+1. `BinauraWave-Audio-Asset-Namer-1.2.6-Windows-x64.zip`
+2. `SHA256SUMS.txt`
 
-After the checks above, attach only:
+The ZIP includes the executable and required notices. Do not upload old candidates, build environments, fixtures, internal evidence or a bare EXE without its notices. Binaries stay out of source commits.
 
-- `BinauraWave-Audio-Asset-Namer-1.2.6-Windows-x64.zip`
-- `SHA256SUMS.txt`
+README reviewed/updated for the runtime, build safeguards, report links and Windows 10 limitation. CHANGELOG reviewed/updated under 1.2.6; no application version bump was warranted. Relevant tests and packaged acceptance are recorded above. Build/spec/notice collector, release tests, provenance/licence documents and notices are the only changed areas.
 
-The ZIP includes the EXE and required legal notices. The EXE hash also supports checking after extraction; avoid distributing a bare EXE without its notices. Do not upload old 1.2.4 ZIPs, fixtures, environments, `build/` or internal build reports. Do not commit compiled files to the source repository. If a rebuild changes files, replace the hashes in this report before upload.
-
-## Changes and isolation
-
-Application: `app.py` (verified GitHub link), `core.py` (version only). Build/tests: `build_windows.py`, existing app regression suite and new `tests/release_packaging_regression.py`. Documentation: reviewed/updated README, CHANGELOG, AUDIT_REPORT, PACKAGING_TESTS, RELEASE_README, THIRD_PARTY_NOTICES, SECURITY, this report and `licenses/` provenance/notice files. Existing spec, build launcher, original MIT/branding scope and processing modules are unchanged.
-
-The private BinauraWave repository remained clean at its original HEAD throughout the final read-only check. No private application files were modified or bundled. Existing public remote configuration was left unchanged. The audit/build work and local commits are confined to the standalone copy.
+No push, publication, tag, GitHub Release, remote/permission change or private BinauraWave application modification was performed. All edits and local commits are confined to the standalone copy.

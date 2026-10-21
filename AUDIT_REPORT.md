@@ -28,3 +28,7 @@ Normal Git recovery metadata may retain the superseded object locally; it is not
 ## Remaining release checks
 
 This is ready for source/public review, not a published binary release. Windows 10/clean-machine executable checks, live default-browser checks, signing decisions and exact runtime/DLL licence review belong to the release checklist in `PACKAGING_TESTS.md`. The owner subsequently published the verified repository at https://github.com/cmderdanblackburno7/audio_asset_namer; version 1.2.6 enables that optional footer link. See RELEASE_READINESS.md for final binary evidence and remaining checks.
+
+## Runtime follow-up — 2026-10-22
+
+The custom runtime/provenance investigation is complete for the refreshed 1.2.6 artifact: official PSF Python 3.13.17, exact native hashes, matching redistribution notices, omitted unused XZ and isolated build DLL discovery. See `RUNTIME_SECURITY.md` for applicability and `RELEASE_READINESS.md` for current hashes/tests and bounded release assessment. The owner reported a successful separate Windows 10 10-MP3 test of the previous artifact; the report does not attribute that result to a later binary.
