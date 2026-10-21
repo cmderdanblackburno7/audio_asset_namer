@@ -61,7 +61,7 @@ Compare **all 64 hexadecimal characters** in the output with the matching ZIP li
 
 Only immediate-child MP3s with leading ASCII digits followed by a period, space, underscore or hyphen are included; extension matching is case insensitive. Numbers must run exactly from **1 through the paragraph count**, with no gaps, duplicates or zero. Unnumbered MP3s are ignored and listed. The utility never guesses which paragraph belongs to which recording.
 
-A valid sequence cannot prove the spoken content matches the script: verify the export order yourself. Suggestions use English-language heuristics, aim for 4–8 words within 50 characters, and can be imperfect. Review unfamiliar topics, pronouns, negation and short passages. Repeated suggestions require manual edits; titles must be unique without regard to case.
+A valid sequence cannot prove the spoken content matches the script: verify the export order yourself. Suggestions use English-language heuristics, aim for 4â€“8 words within 50 characters, and can be imperfect. Review unfamiliar topics, pronouns, negation and short passages. Repeated suggestions require manual edits; titles must be unique without regard to case.
 
 ## Output and privacy
 
@@ -82,15 +82,19 @@ The script's UTF-8 BOM and paragraph separators are structural; paragraph conten
 
 ## Build a Windows executable
 
-Use **64-bit Windows and Python 3.12** with Tkinter, pip and venv support. Python 3.11+ can run the build script. From this checkout:
+Use **64-bit Windows and the reviewed official PSF Python 3.13.17 runtime** with Tkinter, pip and venv support. From this checkout:
 
 ```powershell
-py -3.12 build_windows.py --gui-smoke
+py -3.13 build_windows.py --gui-smoke
 ```
 
-Or double-click `build_windows.bat`. The script creates an ignored `.build-venv`, installs the exact build-only dependencies in `requirements-build.txt`, runs this checkout's tests, and builds with PyInstaller's one-file/windowed spec. Initial dependency installation needs package-index access. `--skip-install` reuses an already prepared environment; `--gui-smoke` needs an interactive desktop and can be omitted for regular tests.
+Or double-click `build_windows.bat`. The release builder checks the exact Python version and native binary hashes in `licenses/runtime-provenance.json`; an old/custom runtime is refused. Move any old `.build-venv` into an ignored backup folder before changing runtimes. Other runtime versions need a fresh provenance/licensing review.
 
-Outputs go to ignored `dist/`: the executable, short README, versioned Windows-x64 ZIP and build/checksum report plus `SHA256SUMS.txt`. The ZIP includes source/branding licence notices and collected Python/Tcl/Tk/build-package notices. The build report also records the source commit and whether the source tree was dirty. A final release must be built from a clean reviewed commit. The source app has no additional runtime pip dependencies. `build/` holds temporary build data. No development fixtures, source audio, private application files or copied virtual environment are bundled.
+A project-local runtime can also be prepared without a system install: download the [official full runtime ZIP](https://www.python.org/ftp/python/3.13.17/python-3.13.17-amd64.zip), compare its SHA-256 with `archive_sha256` in the provenance file and the [PSF release manifest](https://www.python.org/ftp/python/3.13.17/windows-3.13.17.json), then extract it into `build/python-runtime`. Run `.\build\python-runtime\python.exe build_windows.py --gui-smoke`. The embeddable ZIP is a different package and lacks Tkinter.
+
+ The script creates an ignored `.build-venv`, installs the exact build-only dependencies in `requirements-build.txt`, runs this checkout's tests, and builds with PyInstaller's one-file/windowed spec. Initial dependency installation needs package-index access. `--skip-install` reuses an already prepared environment; `--gui-smoke` needs an interactive desktop and can be omitted for regular tests.
+
+Outputs go to ignored `dist/`: the executable, short README, versioned Windows-x64 ZIP and build/checksum report plus `SHA256SUMS.txt`. The ZIP includes source/branding licence notices and collected Python/Tcl/Tk/build-package notices. The build report also records the source commit and whether the source tree was dirty. A final release must be built from a clean reviewed commit. The source app has no additional runtime pip dependencies. `build/` holds temporary build data. No development fixtures, source audio, private application files or copied virtual environment are bundled. Unused XZ/LZMA decoding is explicitly excluded; bundled native files must match the reviewed PSF binaries.
 
 Review [third-party requirements](THIRD_PARTY_NOTICES.md) and the [release test checklist](PACKAGING_TESTS.md) before publication. Compiled executables and ZIPs belong in **GitHub Releases**, never source commits. Build/publishing/signing are separate steps; these scripts do not push, upload or change Git remotes.
 
@@ -118,5 +122,7 @@ All four footer links are optional and open only when clicked; they cause no sta
 Original source code, tests, build scripts and original documentation are under the [MIT licence](LICENSE). This does not extend to the reserved BinauraWave name, trademarks, logo, favicon or branded artwork: see [BRANDING.md](BRANDING.md). Third-party components keep their own licences; see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
 The workspace uses Tk's bundled `clam` theme and standard-library Windows APIs. Native file pickers and message dialogs follow OS styling; unsupported systems may keep a light title bar. Large text/high-DPI settings, clean-machine executable releases and browser associations need release-time checks. The fixed dark workspace does not automatically follow OS high-contrast preferences.
+
+See [RUNTIME_SECURITY.md](RUNTIME_SECURITY.md) for the dated native-library/advisory review and [RELEASE_READINESS.md](RELEASE_READINESS.md) for exact artifact identities and performed checks. A separate Windows 10 laptop successfully processed 10 real MP3s in the previous 1.2.6 build, as reported by its owner. Its occasionally light title bar until focus is a cosmetic limitation. Runtime-refreshed artifacts need their own checks; the report distinguishes these builds.
 
 See [CHANGELOG.md](CHANGELOG.md) for version history. This standalone utility contains no commercial BinauraWave application code.

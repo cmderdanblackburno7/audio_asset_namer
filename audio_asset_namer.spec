@@ -7,7 +7,8 @@ a = Analysis(
     datas=[(str(tool_dir / "favicon.ico"), "."),
            (str(tool_dir / "assets" / "logo.png"), "assets")],
     hiddenimports=[], hookspath=[], hooksconfig={}, runtime_hooks=[],
-    excludes=["pip", "setuptools", "wheel", "pytest", "unittest"],
+    # The utility never decodes archives; omit unused liblzma/XZ decoder code.
+    excludes=["pip", "setuptools", "wheel", "pytest", "unittest", "lzma", "_lzma"],
     noarchive=False,
 )
 pyz = PYZ(a.pure)

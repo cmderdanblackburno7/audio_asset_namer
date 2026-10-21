@@ -16,7 +16,7 @@ def collect_notices(output):
     expected = (root / "build" / "release-notices").resolve()
     if output != expected or root not in output.parents:
         raise ValueError("Notice output must be this checkout's build/release-notices directory")
-    if not tkinter.Tcl().eval("info patchlevel").startswith("8.6.") or tkinter.TkVersion != 8.6:
+    if tkinter.Tcl().eval("info patchlevel") != "8.6.15" or tkinter.TkVersion != 8.6:
         raise ValueError("Review and update Tcl/Tk notice versions before building with this runtime")
     python_license = Path(sys.base_prefix) / "LICENSE.txt"
     if not python_license.is_file():

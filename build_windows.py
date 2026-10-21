@@ -39,6 +39,19 @@ def source_state():
         return {"commit": None, "dirty": None}
 
 
+def verify_runtime(python):
+    """Reject stale/custom build runtimes whose native provenance was not reviewed."""
+    review = json.loads((TOOL / "licenses" / "runtime-provenance.json").read_text(encoding="utf-8"))
+    code = "import json,sys; print(json.dumps({'version': '.'.join(map(str,sys.version_info[:3])), 'base': sys.base_prefix}))"
+    actual = json.loads(subprocess.check_output([str(python), "-c", code], text=True))
+    if actual["version"] != review["python_version"]:
+        raise ValueError("Build requires reviewed Python " + review["python_version"] + "; move the old .build-venv aside before rebuilding.")
+    base = Path(actual["base"])
+    for name, expected in review["binaries"].items():
+        if sha256(base / name) != expected:
+            raise ValueError(f"Unreviewed build runtime binary: {name}")
+
+
 def verify_checksums(checksum_file):
     for line in checksum_file.read_text(encoding="ascii").splitlines():
         if not line or line.startswith("#"):
@@ -75,24 +88,32 @@ def verify_executable(executable, python):
     code = ("import sys; from PyInstaller.archive.readers import CArchiveReader; "
             "r=CArchiveReader(sys.argv[1]); names={n.replace(chr(92),'/') for n in r.toc}; "
             "assert {'favicon.ico','assets/logo.png'} <= names, 'Missing branding assets'; "
-            "assert any(n.endswith('python312.dll') or n.startswith('python3') and n.endswith('.dll') for n in names), 'Missing Python'; "
+            "assert 'python313.dll' in names, 'Missing Python'; "
             "assert any('_tkinter' in n for n in names), 'Missing Tkinter'; "
             "assert not any(n.startswith(('tests/','screenshots/','.git/','wordpress/','prepared-audio/')) for n in names), 'Development files bundled'; "
-            "print('Verified GUI subsystem and bundled Python/Tk/branding; no project test/data folders.')")
-    run(python, "-c", code, executable)
+            "assert not any('_lzma' in n for n in names), 'Unused XZ decoder bundled'; "
+            "import hashlib,json; from pathlib import Path; "
+            "review=json.loads(Path(sys.argv[2]).read_text(encoding='utf-8')); "
+            "known={Path(n).name.lower():h for n,h in review['binaries'].items()}; "
+            "native=[n for n in r.toc if n.lower().endswith(('.dll','.pyd'))]; "
+            "assert all(hashlib.sha256(r.extract(n)).hexdigest()==known.get(Path(n).name.lower()) for n in native), 'Unreviewed bundled native binary'; "
+            "print('Verified GUI subsystem, assets, omitted XZ and exact PSF native binary hashes.')")
+    run(python, "-c", code, executable, TOOL / "licenses" / "runtime-provenance.json")
 
 
 def build(skip_install=False, gui_smoke=False):
     if sys.platform != "win32" or struct.calcsize("P") != 8:
-        raise ValueError("Build on 64-bit Windows with a 64-bit Python interpreter (3.12 recommended).")
+        raise ValueError("Build on 64-bit Windows with a 64-bit Python interpreter (3.13.17 reviewed).")
     if sys.version_info < (3, 11):
-        raise ValueError("The build script needs Python 3.11+ (3.12 recommended); the source app supports 3.10+.")
+        raise ValueError("Release builds require reviewed Python 3.13.17; the source app supports 3.10+.")
+    verify_runtime(sys.executable)
     provenance = source_state()
     BUILD.mkdir(exist_ok=True)
     DIST.mkdir(exist_ok=True)
     python = ENVIRONMENT / "Scripts" / "python.exe"
     if not python.exists():
         venv.EnvBuilder(with_pip=True).create(ENVIRONMENT)
+    verify_runtime(python)
     if not skip_install:
         run(python, "-m", "pip", "install", "--disable-pip-version-check", "--no-cache-dir",
             "-r", TOOL / "requirements-build.txt")

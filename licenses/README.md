@@ -1,16 +1,20 @@
-# Retained third-party terms
+# Retained third-party terms — runtime review 2026-10-22
 
-- `TCL-8.6.txt`: verbatim Tcl 8.6.12 terms from https://raw.githubusercontent.com/tcltk/tcl/core-8-6-12/license.terms
-- `TK-8.6.txt`: verbatim Tk 8.6.12 terms from https://raw.githubusercontent.com/tcltk/tk/core-8-6-12/license.terms
+The reviewed release runtime is official PSF CPython 3.13.17 Windows AMD64, with OpenSSL 3.5.9 and Tcl/Tk 8.6.15. `runtime-provenance.json` records its official ZIP/manifest/SBOM URLs, ZIP checksum and exact native-file hashes. Hashes cover the complete PSF runtime's native files; only the subset identified in the final EXE is redistributed.
 
-These notice texts retain their upstream terms and are not covered by the utility's MIT licence. No Tcl/Tk implementation source is vendored. The build-only notice collector adds the full licence from the actual Python interpreter and installed build packages to release ZIPs. Review matching terms if runtime versions change.
+Retained verbatim upstream terms:
 
-## Additional bundled-runtime notices (1.2.6 audit)
+- `TCL-8.6.txt`: https://raw.githubusercontent.com/tcltk/tcl/core-8-6-15/license.terms
+- `TK-8.6.txt`: https://raw.githubusercontent.com/tcltk/tk/core-8-6-15/license.terms
+- `TCL-LIBTOMMATH-LICENSE.txt`: https://raw.githubusercontent.com/tcltk/tcl/core-8-6-15/libtommath/LICENSE
+- `OPENSSL-LICENSE.txt` / `OPENSSL-AUTHORS.md`: https://github.com/openssl/openssl/tree/openssl-3.5.9
+- `ZLIB-LICENSE.txt`: https://raw.githubusercontent.com/madler/zlib/v1.3.1/LICENSE (Python and Tcl's bundled zlib 1.3.1).
+- `LIBFFI-LICENSE.txt`: https://raw.githubusercontent.com/libffi/libffi/v3.4.4/LICENSE
+- `LIBMPDEC-LICENSE.txt`: https://raw.githubusercontent.com/python/cpython-source-deps/mpdecimal-4.0.0/COPYRIGHT.txt
+- `HACL-LICENSE.txt`: copyright/licence comment from https://raw.githubusercontent.com/python/cpython/v3.13.17/Modules/_hacl/Hacl_Hash_SHA2.c
+- `PYTHON-INCORPORATED.rst`: https://raw.githubusercontent.com/python/cpython/v3.13.17/Doc/license.rst, including Python's additional incorporated-code notices (HACL*, Unicode and others). References to the interpreter licence are fulfilled by the collected full `PYTHON.txt`.
+- `LIBLZMA-COPYING.txt`: https://raw.githubusercontent.com/tukaani-project/xz/v5.2.5/COPYING, retained as historical attribution. **The reviewed executable excludes `_lzma`/`lzma` and does not redistribute liblzma.**
 
-- `OPENSSL-LICENSE.txt` and `OPENSSL-AUTHORS.md`: verbatim OpenSSL 3.5.8 files from https://github.com/openssl/openssl/tree/openssl-3.5.8 (matching the actual runtime's reported version). OpenSSL copyright 1998–2026 The OpenSSL Authors.
-- `ZLIB-LICENSE.txt`: verbatim https://raw.githubusercontent.com/madler/zlib/v1.3.2/LICENSE (matching `zlib.ZLIB_RUNTIME_VERSION`).
-- `LIBMPDEC-LICENSE.txt`: verbatim copyright/licence comment from https://raw.githubusercontent.com/python/cpython/v3.12.14/Modules/_decimal/libmpdec/mpdecimal.h (matching libmpdec 2.5.1).
-- `LIBFFI-LICENSE.txt`: verbatim https://raw.githubusercontent.com/libffi/libffi/v3.4.4/LICENSE.
-- `LIBLZMA-COPYING.txt`: verbatim https://raw.githubusercontent.com/tukaani-project/xz/v5.2.5/COPYING.
+Exact libffi 3.4.4 / XZ 5.2.5 provenance is now established by the PSF SBOM and Windows build declarations, rather than inferred for the previous custom runtime. SBOM `NOASSERTION` fields are not licence grants; the actual upstream terms above govern redistribution. Microsoft runtime conditions and bzip2 terms are included in the actual interpreter's complete `LICENSE.txt`, copied into release ZIPs as `licenses/PYTHON.txt`.
 
-The last two are the baseline versions declared in CPython 3.12.14's `PCbuild/python.props`; exact libffi/liblzma provenance in this custom Windows runtime still needs confirmation before public binary release. Their presence here does not certify that runtime provenance. See `RELEASE_READINESS.md` for the final build inventory and limitations. Microsoft runtime terms are retained in the actual interpreter's full `PYTHON.txt` notice inside the release ZIP. The collector automatically includes this entire directory; it does not fetch these files at build time or startup.
+These files retain third-party terms and are not covered by the utility's original-code MIT licence. BinauraWave artwork is separately reserved. This directory contains notices/metadata, not third-party implementation source. The existing build-only collector includes it without network requests. See `RUNTIME_SECURITY.md` and `RELEASE_READINESS.md` for applicability and final build evidence. Review matching terms/hashes when dependencies change.

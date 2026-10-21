@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.2.6 — 2026-10-21
+## 1.2.6 â€” 2026-10-21
 
 - Enable the verified public GitHub footer link; no startup network requests or processing changes.
 - Extend existing release hashes with a reverified `SHA256SUMS.txt` and source commit/clean-tree metadata.
@@ -8,7 +8,7 @@
 - Retain additional bundled OpenSSL, zlib, libmpdec, libffi and liblzma notices through the existing licence collector.
 - Reuse the existing pinned build and PyInstaller spec for a clean local release audit. No publication, tag or push.
 
-## 1.2.5 — 2026-10-21
+## 1.2.5 â€” 2026-10-21
 
 - Prepare an independent source repository with its own tests, fixtures and root-relative build paths.
 - Add a public README, MIT terms for original code, separate reserved-branding terms and third-party notices.
