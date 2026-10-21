@@ -61,7 +61,7 @@ Compare **all 64 hexadecimal characters** in the output with the matching ZIP li
 
 Only immediate-child MP3s with leading ASCII digits followed by a period, space, underscore or hyphen are included; extension matching is case insensitive. Numbers must run exactly from **1 through the paragraph count**, with no gaps, duplicates or zero. Unnumbered MP3s are ignored and listed. The utility never guesses which paragraph belongs to which recording.
 
-A valid sequence cannot prove the spoken content matches the script: verify the export order yourself. Suggestions use English-language heuristics, aim for 4â€“8 words within 50 characters, and can be imperfect. Review unfamiliar topics, pronouns, negation and short passages. Repeated suggestions require manual edits; titles must be unique without regard to case.
+A valid sequence cannot prove the spoken content matches the script: verify the export order yourself. Suggestions use English-language heuristics, aim for 4Ã¢â‚¬â€œ8 words within 50 characters, and can be imperfect. Review unfamiliar topics, pronouns, negation and short passages. Repeated suggestions require manual edits; titles must be unique without regard to case.
 
 ## Output and privacy
 
@@ -94,7 +94,7 @@ A project-local runtime can also be prepared without a system install: download 
 
  The script creates an ignored `.build-venv`, installs the exact build-only dependencies in `requirements-build.txt`, runs this checkout's tests, and builds with PyInstaller's one-file/windowed spec. Initial dependency installation needs package-index access. `--skip-install` reuses an already prepared environment; `--gui-smoke` needs an interactive desktop and can be omitted for regular tests.
 
-Outputs go to ignored `dist/`: the executable, short README, versioned Windows-x64 ZIP and build/checksum report plus `SHA256SUMS.txt`. The ZIP includes source/branding licence notices and collected Python/Tcl/Tk/build-package notices. The build report also records the source commit and whether the source tree was dirty. A final release must be built from a clean reviewed commit. The source app has no additional runtime pip dependencies. `build/` holds temporary build data. No development fixtures, source audio, private application files or copied virtual environment are bundled. Unused XZ/LZMA decoding is explicitly excluded; bundled native files must match the reviewed PSF binaries.
+Outputs go to ignored `dist/`: the executable, short README, versioned Windows-x64 ZIP and build/checksum report plus `SHA256SUMS.txt`. The ZIP includes source/branding licence notices and collected Python/Tcl/Tk/build-package notices. The build report also records the source commit and whether the source tree was dirty. A final release must be built from a clean reviewed commit. The source app has no additional runtime pip dependencies. `build/` holds temporary build data. No development fixtures, source audio, private application files or copied virtual environment are bundled. Unused XZ/LZMA decoding is explicitly excluded; bundled native files must match the reviewed PSF binaries. PyInstaller uses a restricted runtime/Windows PATH so unrelated developer tools cannot supply native dependencies.
 
 Review [third-party requirements](THIRD_PARTY_NOTICES.md) and the [release test checklist](PACKAGING_TESTS.md) before publication. Compiled executables and ZIPs belong in **GitHub Releases**, never source commits. Build/publishing/signing are separate steps; these scripts do not push, upload or change Git remotes.
 

@@ -126,6 +126,12 @@ def build(skip_install=False, gui_smoke=False):
     run(python, TOOL / "tests" / "release_packaging_regression.py")
     environment = os.environ.copy()
     environment["PYINSTALLER_CONFIG_DIR"] = str(BUILD / "pyinstaller-cache")
+    # Do not collect compatibility DLLs from unrelated developer tools on PATH.
+    windows = Path(os.environ["SystemRoot"])
+    environment["PATH"] = os.pathsep.join(map(str, (ENVIRONMENT / "Scripts", Path(sys.base_prefix),
+                                                    Path(sys.base_prefix) / "DLLs", windows / "System32", windows)))
+    for key in ("PYTHONHOME", "PYTHONPATH", "TCL_LIBRARY", "TK_LIBRARY"):
+        environment.pop(key, None)
     run(python, "-m", "PyInstaller", "--clean", "--noconfirm", "--distpath", DIST,
         "--workpath", BUILD, TOOL / "audio_asset_namer.spec", env=environment)
     executable = DIST / EXE_NAME

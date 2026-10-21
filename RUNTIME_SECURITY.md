@@ -1,4 +1,4 @@
-# Runtime security and redistribution review — 2026-10-22
+# Runtime security and redistribution review â€” 2026-10-22
 
 Scope: Audio Asset Namer 1.2.6, Windows x64, normal-user local file processing. This is an evidence-based applicability review, not penetration testing, an antivirus certification or a guarantee against unknown vulnerabilities. `RELEASE_READINESS.md` identifies the exact final artifacts and test results.
 
@@ -13,7 +13,7 @@ The replacement is the **official PSF Python 3.13.17 Windows AMD64 full runtime*
 - Its `python313.dll` Authenticode signature validated as **Python Software Foundation**. This does not sign the finished application EXE.
 - [PSF release SBOM](https://www.python.org/ftp/python/3.13.17/python-3.13.17-amd64.exe.spdx.json), [Windows dependency declarations](https://github.com/python/cpython/blob/v3.13.17/PCbuild/python.props) and [Tcl/Tk declarations](https://github.com/python/cpython/blob/v3.13.17/PCbuild/tcltk.props) establish dependency origins. The installer SBOM describes the official Windows build, not a claim that every listed component ships in this utility. Actual runtime version queries confirm Python 3.13.17, OpenSSL 3.5.9, Tcl/Tk 8.6.15, zlib 1.3.1 and mpdecimal 4.0.0.
 
-`licenses/runtime-provenance.json` records the PSF URLs, ZIP/SBOM hashes and 34 native-file hashes from that verified ZIP. Before building, both the selected interpreter and cached build environment must match. After building, **every bundled DLL/PYD** must match an official file hash; unknown/mismatched native files fail the build. The PyInstaller bootloader separately comes from pinned PyInstaller 6.22.3. This is stronger than inferring origin from a DLL filename or version string.
+`licenses/runtime-provenance.json` records the PSF URLs, ZIP/SBOM hashes and 34 native-file hashes from that verified ZIP. Before building, both the selected interpreter and cached build environment must match. After building, **every bundled DLL/PYD** must match an official file hash; unknown/mismatched native files fail the build. The initial strengthened check caught Microsoft compatibility DLLs being collected from an unrelated developer-tool directory on inherited PATH. The build now restricts PATH to the reviewed runtime, build environment and Windows directories, and removes Python/Tcl path overrides during PyInstaller analysis. Unknown DLLs remain a hard failure rather than being allowed because they resemble system files. The PyInstaller bootloader separately comes from pinned PyInstaller 6.22.3. This is stronger than inferring origin from a DLL filename or version string.
 
 Unused `lzma`/`_lzma` archive support is excluded in the spec, removing liblzma from the frozen app. No DLL was swapped individually. The application source, UI, title rules, input validation, copying and CSV behaviour are unchanged; version remains 1.2.6.
 
