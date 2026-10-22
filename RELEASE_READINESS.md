@@ -1,3 +1,51 @@
+# Release readiness — 1.3.1 — 2026-10-22
+
+**Website attribution update built and checked locally; ready for owner review.** Nothing was pushed, published, tagged or uploaded. Windows 10 acceptance has not been rerun for 1.3.1.
+
+## Current artifacts
+
+The existing top-level dist executable was locked during the first build attempt. It was left untouched; the successful new build is isolated under **`dist/1.3.1/`**, using the same build function and pinned environment. Do not confuse the older top-level files with this candidate.
+
+Built from clean source commit `dc0d3901e0dde0ee3c133bac727ace36e78bf253` (`dirty: false`). This later report does not change the artifacts. The reviewed Python 3.13.17 / OpenSSL 3.5.9 / Tcl/Tk 8.6.15 runtime, PyInstaller 6.22.3, spec and native binaries are unchanged.
+
+| File under `dist/1.3.1/` | Bytes | SHA-256 |
+| --- | ---: | --- |
+| `BinauraWave-Audio-Asset-Namer.exe` | 10,987,222 | `79b49777e2247d7b6b44bacfb80c9166236d6c3b958adb5d650e568ea8900729` |
+| `BinauraWave-Audio-Asset-Namer-1.3.1-Windows-x64.zip` | 10,827,547 | `012691f75962b90c898c29c25858844aa88c936b04e87f5c424a96004d2a3f51` |
+
+`SHA256SUMS.txt` was regenerated and reverified against both final artifacts. `build-info.json` records exact source/environment identity. ZIP CRC checks and identical embedded/standalone EXE checks passed. Local licence/provenance notices are included. Signing status remains `NotSigned`.
+
+## Scope and evidence
+
+- Only the three BinauraWave footer URLs receive `utm_source=asset-namer`, `utm_medium=desktop_app`, `utm_campaign=free_creator_tools`. Scheme/host/path remain the homepage, `/binaurawave_app/` and `/feedback/` respectively. GitHub remains exactly `https://github.com/cmderdanblackburno7/audio_asset_namer`.
+- Standard-library URL splitting, query parsing with blank values preserved, and URL encoding preserve existing values/repeated non-UTM keys/fragments. Existing campaign keys are replaced rather than duplicated; applying the helper twice is stable.
+- The existing explicit button callback still opens the default browser with `new=2`; its error fallback retains the full URL. No analytics SDK, cookies, telemetry, background requests or new runtime dependency was added. Local URL construction performs no network operation. The website receives these query values only when a user opens the link.
+- **PASS: 27 application regressions, five release checks and 30 output-workflow tests (62 total)**, plus the existing source GUI smoke covering startup without browser dispatch, all four mocked link buttons, About, focus/contrast/layouts, icon/DWM readback and load/edit/export/results.
+- Three new regressions check exact destinations/parameters, unchanged GitHub, existing queries, percent encoding/Unicode/blank/repeated values, fragments, idempotence, explicit browser dispatch and fallback. No real website requests were needed for these tests.
+- **PASS: actual EXE archive check.** Extracted packaged app bytecode was initialized under a non-main module name with browser opening mocked: all three exact tracked URLs and the unchanged GitHub URL were verified, with no initialization browser call. Other module imports used the matching checkout; this is a packaged URL check, not a substitute for executing the full frozen app.
+- **PASS: packaged startup on Windows 11.** The final ZIP was extracted into an ignored Downloads test folder, then its EXE launched with System32-only PATH and Python/Tcl/Tk environment overrides removed. Version 1.3.1, local logo/icon and dark UI/title bar were observed. It closed normally. Existing older instances were not closed.
+- Build checks passed x64 GUI subsystem, local assets, excluded XZ/development resources, exact reviewed PSF native hashes and release ZIP integrity. No console was observed during normal startup.
+
+Source changes are confined to app.py link construction and the core.py version constant, three regression tests, README, CHANGELOG, release README, packaging-test documentation and this report. Audio matching, title generation, editing, validation, replacement/export logic, CSV schema, branding and layout were not changed. README/version/changelog were reviewed and updated; existing tests were run by the fresh build.
+
+## Remaining limits
+
+Live destination pages/website analytics reception were not tested, and no new full packaged audio workflow or Windows 10 laptop acceptance is claimed for this patch. Source GUI audio/export checks and all output-workflow regressions passed; prior packaged 1.3.0 results and conservative NTFS/recovery limits remain documented below. No new vulnerability scan, antivirus approval, code signing or absolute security guarantee is claimed. Website cookies/analytics are controlled by the website/browser; none were added to the desktop app.
+
+For owner testing, use the ZIP and checksum file in **dist/1.3.1/**. To repeat this isolated-output build while the older EXE remains open, use the reviewed interpreter with:
+
+```powershell
+python -c "import build_windows as b; b.DIST=b.TOOL/'dist'/'1.3.1'; b.build(skip_install=True,gui_smoke=True)"
+```
+
+This reuses already installed pinned build dependencies; use the normal documented build process for a fresh environment and close an existing executable before replacing that same path. Binaries and test evidence remain ignored and uncommitted. The private BinauraWave repository stayed clean at `9175bb6ff29e9d4f9acc24b6f36dc98a69010ace`. No Git remotes or publication settings changed.
+
+---
+
+# Historical 1.3.0 workflow review
+
+The report below applies to the preceding build; current 1.3.1 identities and checks are above.
+
 # Release readiness — 1.3.0 — 2026-10-22
 
 **Ready for owner review and a fresh Windows 10 acceptance check.** The new output workflow passed the checks below. No confirmed blocker was found in those checks. Version 1.2.6 passed the owner's separate Windows 10 laptop test; that result is not claimed for this new version. Nothing has been published, pushed, tagged or released.
