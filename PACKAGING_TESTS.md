@@ -1,10 +1,12 @@
 # Testing and release review
 
-Run `python tests/audio_asset_namer_regression.py` and `python tests/release_packaging_regression.py` from this standalone checkout. Add `--gui-smoke` on an interactive Windows desktop to check the actual Tk interface. All fixtures are local examples and generated dummy bytes; no personal audio or private repository is needed.
+Run `python tests/audio_asset_namer_regression.py`, `python tests/release_packaging_regression.py` and `python tests/export_workflow_regression.py` from this standalone checkout. Add `--gui-smoke` on an interactive Windows desktop to check the actual Tk interface. All fixtures are local examples and generated dummy bytes; no personal audio or private repository is needed.
 
 The 24 application checks and five release-check tests cover numeric source matching, invalid counts/sequences, UTF-8/BOM/paragraph preservation, pause cleaning, descriptive titles across topics, duplicate/unsafe titles, exact byte copies, CSV fields, unchanged originals, stale previews, overwrite prevention, copy/manifest failures, local branding, source/bundle asset paths and packaging configuration. Release checks also reject a stale build environment and altered native runtime binary. The optional desktop smoke exercises loading, editing, export, contrast, keyboard traversal, four layouts and native Windows icon/DWM readback. It mocks website opening; the tests make no website requests.
 
 The 2026-10-22 owner-reported separate Windows 10 laptop test passed matching, title editing, naming/export and CSV for 10 MP3s using the previous 1.2.6 artifact. The title bar occasionally stayed light until focus; this is cosmetic. Do not attribute that test to a later rebuilt EXE without retesting it.
+
+Version 1.3.0 adds 30 workflow tests: 25 backend cases plus five desktop cases with `--gui-smoke`. They cover alternative destinations, repeated replacement/title changes, session ownership, case-insensitive collisions, partial legacy manifests, changed inputs, staging/backup/commit/rollback failures, retained recovery, linked files, unsupported locations, cancellation and safe Enter/Escape defaults. A subprocess forced to exit mid-commit verifies old bytes in durable recovery storage and retry refusal. Without a desktop, five UI cases are explicitly skipped, never reported as passed.
 
 ## Before attaching a Windows build to GitHub Releases
 
@@ -14,6 +16,7 @@ The 2026-10-22 owner-reported separate Windows 10 laptop test passed matching, t
 - Run the executable alone from an unrelated folder on a clean Windows machine without Python, using disposable numbered MP3s and a UTF-8 script.
 - Check the local logo/icon, title bar, native pickers, matching preview, edited filenames, duplicate rejection, confirmed output directory, per-file results and CSV. Compare copied audio hashes and confirm originals/scripts remain unchanged.
 - Check all four website/support/GitHub links in the default browser. The official public GitHub URL is now enabled; no startup navigation is permitted.
+- Exercise all three existing-output choices in the packaged EXE. Verify cancelled picker/confirmation leave files untouched, alternative output uses the displayed folder, replacement changes only recognised exports and leaves readable recovery copies, and unrelated collisions are refused.
 - Check standard and high-DPI displays, Windows 10/11, taskbar shortcuts and release signing status.
 
 A passing source test suite is not a substitute for reviewing a newly built executable and its licences. The final audit rebuilds locally but does not upload or publish a binary. The dated `RELEASE_READINESS.md` records performed and unperformed checks; do not treat this checklist itself as evidence of a pass. Old local build/test paths and records are intentionally excluded from public documentation.

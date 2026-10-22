@@ -124,6 +124,7 @@ def build(skip_install=False, gui_smoke=False):
         raise ValueError(f"Regression suite is required before building: {test}")
     run(python, test, *(["--gui-smoke"] if gui_smoke else []))
     run(python, TOOL / "tests" / "release_packaging_regression.py")
+    run(python, TOOL / "tests" / "export_workflow_regression.py", *(["--gui-smoke"] if gui_smoke else []))
     environment = os.environ.copy()
     environment["PYINSTALLER_CONFIG_DIR"] = str(BUILD / "pyinstaller-cache")
     # Do not collect compatibility DLLs from unrelated developer tools on PATH.

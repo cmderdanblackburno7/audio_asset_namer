@@ -7,7 +7,7 @@ import re
 import shutil
 from titles import suggest_title, suggest_titles
 
-VERSION = "1.2.6"
+VERSION = "1.3.0"
 PREFIX = re.compile(r"^(\d+)(?=[. _-])", re.ASCII)
 PAUSE = re.compile(r"\[pause\]", re.IGNORECASE)
 UNSAFE = re.compile(r'[<>:"/\\|?*\x00-\x1f\x7f]')
@@ -119,22 +119,23 @@ def validate_titles(clips):
         used.add(clip.title.casefold())
 
 
-def export_plan(plan, report=lambda name, ok, detail: None):
-    """Revalidate preview, reserve a fresh folder, copy bytes, then manifest successes.
-
-    Return per-file results. A partial output is retained for inspection, never reused.
-    """
+def revalidate_plan(plan):
+    """Check the original preview again before preparing or publishing output."""
     validate_titles(plan.clips)
     current = load_plan(plan.folder, plan.script)
     if (current.script_bytes != plan.script_bytes or
             [(c.number, c.source, c.signature) for c in current.clips] !=
             [(c.number, c.source, c.signature) for c in plan.clips]):
         raise ValidationError("Inputs changed since preview. Load and review them again.")
-    destination = plan.folder / "Named"
-    try:
-        destination.mkdir()  # Exclusive reservation; even an empty existing folder is refused.
-    except FileExistsError as exc:
-        raise ValidationError("Named already exists. Move it aside or select another source folder; nothing was overwritten.") from exc
+
+
+def export_plan(plan, report=lambda name, ok, detail: None, *, destination=None, replace=False, request=None):
+    from exporting import export_prepared, prepare_export
+    return export_prepared(plan, request or prepare_export(plan, destination, replace=replace), report)
+
+
+def copy_exports(plan, destination, report):
+    """Existing exclusive-copy/partial-success behaviour for non-replacement exports."""
     rows, results = [], []
     for clip in plan.clips:
         name = filename(clip)

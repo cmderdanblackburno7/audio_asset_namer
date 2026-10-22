@@ -60,3 +60,9 @@ Named/
 Thumbs.db
 Desktop.ini
 .DS_Store
+
+# User-selected export manifests and recoverable export transactions
+manifest.csv
+.audio-namer-export.lock
+.audio-namer-transaction-*/
+.audio-namer-backup-*/

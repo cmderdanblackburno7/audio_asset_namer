@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.3.0 — 2026-10-22
+
+- Offer Choose another folder / Replace existing exports / Cancel when Named exists, with safe keyboard defaults and full-path confirmation.
+- Retain exclusive copies for alternative destinations; reject collisions and keep unrelated files.
+- Require strict manifest/session ownership and matching audio before replacing recognised exports. Stage new files and verified backups first; use no-clobber publication, rollback and retained recovery copies.
+- Refuse unsupported replacement locations, linked/ambiguous files, active locks and unresolved interrupted transactions. Keep originals, title generation, CSV schema, theme and branding unchanged.
+- Add 30 workflow checks (25 backend and five desktop cases), including real Windows file locking and a forced process-exit recovery test; include them in release builds.
+- Keep the reviewed Python/native runtime, licence scope and local-only processing. Prepare a fresh standalone build; no publication or push.
+
 ## 1.2.6 — 2026-10-21
 
 Runtime/package maintenance reviewed 2026-10-22 (application version unchanged):

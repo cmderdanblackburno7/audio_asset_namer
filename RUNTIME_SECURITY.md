@@ -1,5 +1,12 @@
 # Runtime security and redistribution review — 2026-10-22
 
+## 1.3.0 application follow-up
+
+The dependency review below originated with 1.2.6. Version 1.3.0 keeps that reviewed runtime and adds destination/replacement logic in `exporting.py`. SHA-256 now hashes selected/current/staged audio to validate ownership and copies; it does not accept user-selected algorithms, certificates or keys. Fixed kernel32 volume-query calls limit replacement to local fixed NTFS drives. No new third-party dependency, audio decoder, archive feature or network service was introduced. Fresh builds still enforce exact PSF native hashes and bootloader configuration. The new staged replacement is a recoverable workflow rather than a single atomic multi-file transaction; see README/SECURITY and current RELEASE_READINESS for failure limits and tests.
+
+## Original runtime review
+
+
 Scope: Audio Asset Namer 1.2.6, Windows x64, normal-user local file processing. This is an evidence-based applicability review, not penetration testing, an antivirus certification or a guarantee against unknown vulnerabilities. `RELEASE_READINESS.md` identifies the exact final artifacts and test results.
 
 ## Provenance and practical fixes

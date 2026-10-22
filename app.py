@@ -6,6 +6,7 @@ from tkinter import filedialog, messagebox, ttk
 import webbrowser
 
 from core import VERSION, export_plan, filename, load_plan, validate_titles
+from exporting import exists, prepare_export
 from theme import COLORS, apply_theme
 from windows_branding import apply_window_branding, asset_path, set_app_id
 
@@ -62,7 +63,7 @@ class App:
         self.title.trace_add("write", self.edit)
         self.original = self.text_area(main, "Full original paragraph (read only)", 4)
         self.spoken = self.text_area(main, "Cleaned spoken text — [pause] removed (read only)", 3)
-        self.copy_button = ttk.Button(main, text="Confirm and copy to Named…", command=self.copy, state="disabled", style="Primary.TButton")
+        self.copy_button = ttk.Button(main, text="Confirm and copy…", command=self.copy, state="disabled", style="Primary.TButton")
         self.copy_button.pack(anchor="w", pady=8)
         self.log = self.text_area(main, "Per-file results", 4)
         root.bind("<Configure>", self.fit_workspace, add="+")
@@ -209,6 +210,69 @@ class App:
             clip.title = self.title.get()
             self.tree.item(str(self.selected), values=(clip.number, clip.source.name, clip.title, filename(clip)))
 
+    def existing_output_choice(self, destination):
+        dialog = tk.Toplevel(self.root)
+        dialog.title("Choose where to save")
+        dialog.configure(background=COLORS["background"])
+        dialog.transient(self.root)
+        dialog.resizable(False, False)
+        choice = [None]
+
+        def finish(value=None):
+            choice[0] = value
+            dialog.destroy()
+
+        content = ttk.Frame(dialog, padding=18)
+        content.pack(fill="both", expand=True)
+        ttk.Label(content, text="This output folder already exists.", font=("Segoe UI", 11, "bold")).pack(anchor="w")
+        ttk.Label(content, text=str(destination), wraplength=650).pack(anchor="w", pady=(8, 10))
+        ttk.Label(content, text="Choose another folder to keep everything as it is, or replace only the exports we can safely identify. Replacement needs another confirmation.", wraplength=650).pack(anchor="w")
+        buttons = ttk.Frame(content)
+        buttons.pack(fill="x", pady=(16, 0))
+        choose = ttk.Button(buttons, text="Choose another folder", command=lambda: finish("choose"))
+        choose.pack(side="left", padx=(0, 8))
+        ttk.Button(buttons, text="Replace existing exports", command=lambda: finish("replace")).pack(side="left", padx=(0, 8))
+        ttk.Button(buttons, text="Cancel", command=finish).pack(side="left")
+        dialog.protocol("WM_DELETE_WINDOW", finish)
+        dialog.bind("<Escape>", lambda event: finish())
+        for button in buttons.winfo_children():
+            button.bind("<Return>", lambda event, target=button: (target.invoke(), "break")[1])
+        dialog.bind("<Return>", lambda event: (choose.invoke(), "break")[1])
+        dialog.update_idletasks()
+        dialog.geometry(f"+{self.root.winfo_rootx() + 40}+{self.root.winfo_rooty() + 80}")
+        dialog.grab_set()
+        choose.focus_force()  # Safe default; Enter never selects replacement by default.
+        dialog.after_idle(lambda: apply_window_branding(dialog))
+        self.root.wait_window(dialog)
+        return choice[0]
+
+    def choose_export_request(self):
+        destination, replace = None, False
+        default = self.plan.folder / "Named"
+        if exists(default):
+            choice = self.existing_output_choice(default)
+            if choice == "choose":
+                destination = filedialog.askdirectory(parent=self.root, title="Choose an output folder", mustexist=True)
+                if not destination:
+                    return None
+            elif choice == "replace":
+                replace = True
+            else:
+                return None
+        request = prepare_export(self.plan, destination, replace=replace)
+        if request.replace:
+            title = "Replace these exports?"
+            message = (f"Save {len(self.plan.clips)} clips and their manifest here:\n{request.destination}\n\n"
+                       "Only recognised exports from this session will be replaced. Unrelated files and original recordings will be kept. Previous exports will be saved in a backup folder.\n\nContinue with replacement?")
+        else:
+            title = "Confirm copy"
+            message = (f"Copy {len(self.plan.clips)} files and a CSV to:\n{request.destination}\n\n"
+                       "Original MP3s and script are retained. Existing files will not be overwritten.")
+        if not messagebox.askokcancel(title, message, parent=self.root, default="cancel",
+                                      icon="warning" if request.replace else "question"):
+            return None
+        return request
+
     def copy(self):
         if self.busy or not self.plan:
             return
@@ -217,18 +281,26 @@ class App:
         except ValueError as exc:
             messagebox.showerror("Edit titles before copying", str(exc), parent=self.root)
             return
-        if not messagebox.askokcancel("Confirm copy", f"Copy {len(self.plan.clips)} files and a CSV to:\n{self.plan.folder / 'Named'}\n\nOriginal MP3s and script are retained. An existing Named folder is refused.", parent=self.root):
+        try:
+            request = self.choose_export_request()
+        except (OSError, ValueError) as exc:
+            self.status.configure(text=str(exc))
+            messagebox.showinfo("Choose an output destination", str(exc), parent=self.root)
             return
+        if request is None:
+            self.status.configure(text="Export cancelled. No files changed.")
+            return
+        self.output_request = request
         self.busy = True
         self.editor.configure(state="disabled")
         self.copy_button.configure(state="disabled")
         self.set_text(self.log, "")
-        self.status.configure(text="Copying… Please keep this window open.")
+        self.status.configure(text=f"Copying to {self.output_request.destination}… Please keep this window open.")
         threading.Thread(target=self.worker, daemon=True).start()
 
     def worker(self):
         try:
-            results = export_plan(self.plan, lambda *result: self.events.put(("result", result)))
+            results = export_plan(self.plan, lambda *result: self.events.put(("result", result)), request=self.output_request)
             self.events.put(("done", all(ok for _, ok, _ in results)))
         except Exception as exc:
             self.events.put(("error", str(exc)))
@@ -246,11 +318,12 @@ class App:
                 else:
                     self.busy = False
                     self.editor.configure(state="normal")
+                    self.copy_button.configure(state="normal")
                     if kind == "error":
                         self.status.configure(text="Copy failed: " + value)
                         messagebox.showerror("Copy failed", value, parent=self.root)
                     else:
-                        self.status.configure(text=("Completed successfully. " if value else "Completed with failures; inspect the per-file results. ") + "Named is retained; move it aside before retrying.")
+                        self.status.configure(text=("Completed successfully. " if value else "Completed with failures; inspect the per-file results. ") + f"Output folder: {self.output_request.destination}")
         except queue.Empty:
             pass
         self.root.after(100, self.poll)
