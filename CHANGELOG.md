@@ -7,7 +7,7 @@
 - Require strict manifest/session ownership and matching audio before replacing recognised exports. Stage new files and verified backups first; use no-clobber publication, rollback and retained recovery copies.
 - Refuse unsupported replacement locations, linked/ambiguous files, active locks and unresolved interrupted transactions. Keep originals, title generation, CSV schema, theme and branding unchanged.
 - Add 30 workflow checks (25 backend and five desktop cases), including real Windows file locking and a forced process-exit recovery test; include them in release builds.
-- Keep the reviewed Python/native runtime, licence scope and local-only processing. Prepare a fresh standalone build; no publication or push.
+- Keep the reviewed Python/native runtime, licence scope and local-only processing. Build a fresh standalone EXE/ZIP; 59 tests, source GUI smoke and packaged Windows 11 workflow passed. Windows 10 retest remains outstanding; no publication or push.
 
 ## 1.2.6 — 2026-10-21
 

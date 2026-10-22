@@ -1,3 +1,58 @@
+# Release readiness — 1.3.0 — 2026-10-22
+
+**Ready for owner review and a fresh Windows 10 acceptance check.** The new output workflow passed the checks below. No confirmed blocker was found in those checks. Version 1.2.6 passed the owner's separate Windows 10 laptop test; that result is not claimed for this new version. Nothing has been published, pushed, tagged or released.
+
+## Exact new artifacts
+
+Built from clean standalone source commit `6771d90d1fa0f359fb204416d8e2e43ba2468d45` (`dirty: false`). This post-build report does not change the binaries. Windows x64, one-file/windowed, unchanged reviewed official PSF Python 3.13.17 / OpenSSL 3.5.9 / Tcl/Tk 8.6.15 and PyInstaller 6.22.3.
+
+| File in ignored `dist/` | Bytes | SHA-256 |
+| --- | ---: | --- |
+| `BinauraWave-Audio-Asset-Namer.exe` | 10,986,446 | `e9ac07b232b080f8358457dc224199f067cac0d5b1526cb68d20cea14fc378c2` |
+| `BinauraWave-Audio-Asset-Namer-1.3.0-Windows-x64.zip` | 10,826,680 | `1054ffea9c329fac1f4ea88f97b6236e93988b4c45d668566f0c018aaa9c4ace` |
+
+Final checksums were recomputed after packaged acceptance. The 42-member ZIP passed CRC checks and contains the identical EXE plus README and licensing/provenance notices. `SHA256SUMS.txt` and `build-info.json` identify this build. Earlier 1.2.6 files are not the new release candidate; a backup is retained under ignored `build/release-1.2.6-before-1.3.0/`. The EXE remains unsigned (`NotSigned`).
+
+## Change and safety boundaries
+
+- Existing `Named` opens a friendly, themed three-choice dialog: Choose another folder / Replace existing exports / Cancel. The first choice is the keyboard default; final confirmation defaults to Cancel and shows the full path.
+- Alternative destinations use exclusive, non-overwriting copies and refuse filename/manifest collisions, including case-insensitive collisions.
+- Replacement is restricted to a local fixed Windows NTFS volume and manifest entries matching the selected session/category/text and original audio. A changed/foreign manifest, changed prior audio, ambiguous ownership, links, collisions, locks or unresolved transactions are refused. Unrelated files and subfolders are kept.
+- All new bytes and the complete unchanged-schema CSV are staged first. Verified, flushed copies of all recognised previous exports and their manifest are saved before live files move. Publication is no-clobber. Ordinary failures attempt rollback; backups are retained for inspection/recovery.
+- A forced exit can leave an incomplete visible set, but the tested interrupted commit retained a complete verified previous set. Pending workspaces/locks block retries rather than guessing. No claim of atomic multi-file replacement or protection from arbitrary hardware/power-loss damage is made. Recovery instructions are in README.
+- Original numbered MP3s and source scripts are never replacement targets. Title generation, matching, CSV fields, branding, dark theme and website-link targets are unchanged. SHA-256 now checks audio identity without parsing/decoding audio or processing keys/certificates. The runtime review in RUNTIME_SECURITY.md includes this follow-up.
+
+## Fresh validation
+
+| Check | Observed result |
+| --- | --- |
+| Original application regressions | PASS: 24 tests. |
+| Release/build safeguards | PASS: 5 tests. |
+| Export workflow regressions | PASS: 30 tests (25 backend, five desktop), including repeated exports, alternate destinations, cancellation, duplicates/collisions, ownership refusal, staging/backup/publication failures and rollback. |
+| Windows failure checks | PASS: real Windows locked-file refusal/rollback; child-process forced exit mid-commit preserved verified previous files and blocked unsafe retry. |
+| Original source GUI smoke | PASS: contrast/focus, icon/DWM readback, four layouts, load/edit/export/results, About and mocked link targets. |
+| New packaged Windows 11 workflow | PASS: ZIP-extracted EXE launched with System32-only PATH and no Python/Tcl/Tk overrides; fresh export of two synthetic MP3-labelled byte fixtures succeeded. Repeated export showed the three choices with Choose another folder focused; Escape cancelled without byte changes. Return on the default opened the native Windows folder picker; full alternative destination was shown and export succeeded. |
+| Packaged edit/replacement | PASS: edited first title to `Edited Calm`; replacement confirmation defaulted to Cancel (Return cancelled with previous hashes unchanged). Explicit OK then replaced only the two recognised exports and CSV. The old title file left the live output and was retained in the verified backup. |
+| File integrity | PASS: all new audio matched original bytes, original numbered files/script hashes stayed unchanged, unrelated file and nested directory stayed unchanged, and all prior exports/CSV matched their recovery copies. Both manifests retained all six original CSV columns and two rows. No pending transaction or lock remained after success. |
+| Packaging/runtime integrity | PASS: x64 GUI subsystem, assets, exact PSF native hashes, excluded XZ, legal notices, final ZIP identity and checksums via release build. Local icon/logo and dark native title bar observed in the new EXE. |
+| Separate Windows 10 laptop | NOT YET RUN for 1.3.0. Owner reported 1.2.6 worked with ten real MP3s, manual editing and CSV. Retest the new ZIP on that laptop, including the three existing-folder choices. |
+
+The packaged test uses synthetic opaque byte fixtures, not an audio playback test. External links were not re-clicked in this build; targets/behaviour are unchanged and their source callbacks passed the existing smoke check. No new antivirus certification, penetration test, exhaustive filesystem fault analysis or hardware power-cut test is claimed.
+
+## Documentation, scope and handoff
+
+README, CHANGELOG, release README and packaging test instructions were updated for version 1.3.0. SECURITY/RUNTIME_SECURITY describe the new replacement boundary and unchanged reviewed runtime. Main changes are app.py, core.py, new exporting.py, workflow tests and the build test invocation; title/theme/branding modules remain unchanged. Ignore rules exclude transaction data and user manifests.
+
+Replacement requires extra disk space and retains backup folders. Changed scripts/recordings or non-NTFS/network output locations may require Choose another folder. See README for safe recovery; do not blindly restore over current unrelated files. Native message boxes and the standard folder picker retain OS styling. The previously reported light title bar until focus remains cosmetic and is not a release blocker.
+
+For owner testing, use the 1.3.0 ZIP and matching SHA256SUMS.txt above. Binaries stay out of source control. The private BinauraWave repository remained clean at `9175bb6ff29e9d4f9acc24b6f36dc98a69010ace`; all changes were confined to the standalone repository. No remote configuration was changed.
+
+---
+
+# Historical 1.2.6 runtime security review
+
+The assessment and artifact hashes below apply to the previous 1.2.6 candidate, not the new 1.3.0 workflow. They are retained as security-review history; current handoff details are above.
+
 # Release readiness — 2026-10-22
 
 **READY for a first public release based on the checks performed.** No confirmed applicable security or redistribution-licensing blocker remains from the investigated issues. This is a bounded assessment of the reviewed application and exact artifacts, not an absolute security or antivirus guarantee. A quick Windows 10 spot check of the rebuilt files is recommended; it has not been marked as passed.

@@ -1,12 +1,12 @@
 # BinauraWave Audio Asset Namer
 
-A free, offline Windows desktop utility for turning numbered Audacity MP3 exports into descriptive, editable filenames. Pair your clips with a UTF-8 script, review the suggested titles, and copy the named audio into a fresh folder with a CSV manifest.
+A free, offline Windows desktop utility for turning numbered Audacity MP3 exports into descriptive, editable filenames. Pair your clips with a UTF-8 script, review the suggested titles, and copy the named audio into your output folder with a CSV manifest.
 
 **Current source version: 1.3.0.** Original utility code is MIT-licensed; BinauraWave artwork and trademark rights are reserved separately.
 
 ![Dark interface showing a sample naming preview](screenshots/dark-theme.jpg)
 
-The screenshot shows an earlier build with demonstration text. The layout and workflow remain the same.
+The screenshot shows an earlier build with demonstration text. The main preview layout remains the same; the existing-output choices are described below.
 
 ## Features
 
