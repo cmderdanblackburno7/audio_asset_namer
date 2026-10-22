@@ -2,7 +2,7 @@
 
 A free, offline Windows desktop utility for turning numbered Audacity MP3 exports into descriptive, editable filenames. Pair your clips with a UTF-8 script, review the suggested titles, and copy the named audio into your output folder with a CSV manifest.
 
-**Current source version: 1.3.0.** Original utility code is MIT-licensed; BinauraWave artwork and trademark rights are reserved separately.
+**Current source version: 1.3.1.** Original utility code is MIT-licensed; BinauraWave artwork and trademark rights are reserved separately.
 
 ![Dark interface showing a sample naming preview](screenshots/dark-theme.jpg)
 
@@ -46,7 +46,7 @@ On Windows, `launch.bat` also works with a usable Python launcher or PATH instal
 Download `SHA256SUMS.txt` from the same official release as the ZIP. In Windows PowerShell, from the download folder:
 
 ```powershell
-Get-FileHash .\BinauraWave-Audio-Asset-Namer-1.3.0-Windows-x64.zip -Algorithm SHA256
+Get-FileHash .\BinauraWave-Audio-Asset-Namer-1.3.1-Windows-x64.zip -Algorithm SHA256
 ```
 
 Compare **all 64 hexadecimal characters** in the output with the matching ZIP line in `SHA256SUMS.txt` (letter case does not matter). Stop if they differ and obtain a fresh copy from the official release. After extraction, you can also run `Get-FileHash .\BinauraWave-Audio-Asset-Namer.exe -Algorithm SHA256` and compare the EXE line. Checksums are calculated from the final files and reverified by the build; they detect corruption/changes when the checksum source is trusted.
@@ -137,7 +137,7 @@ Tests and fixtures are included here and need no other repository, credentials, 
 - [Help & Support](https://binaurawave.com/feedback/)
 - [GitHub source and issues](https://github.com/cmderdanblackburno7/audio_asset_namer)
 
-All four footer links are optional and open only when clicked; they cause no startup requests. Report ordinary bugs through [GitHub Issues](https://github.com/cmderdanblackburno7/audio_asset_namer/issues), with the version, Windows version, redacted error text and a tiny synthetic example. For security concerns, see [SECURITY.md](SECURITY.md) and contact support before posting sensitive details publicly. Do not send personal audio, full scripts, passwords, API keys or unredacted local file paths.
+All four footer links are optional and open only when clicked; they cause no startup requests. The three BinauraWave website links include `utm_source=asset-namer`, `utm_medium=desktop_app` and `utm_campaign=free_creator_tools` for website attribution. GitHub is unchanged. These query parameters are sent to the website only when you open a link; no analytics SDK, cookies or background tracking is added to the desktop app. Report ordinary bugs through [GitHub Issues](https://github.com/cmderdanblackburno7/audio_asset_namer/issues), with the version, Windows version, redacted error text and a tiny synthetic example. For security concerns, see [SECURITY.md](SECURITY.md) and contact support before posting sensitive details publicly. Do not send personal audio, full scripts, passwords, API keys or unredacted local file paths.
 
 ## Licence, branding and limitations
 
@@ -145,6 +145,6 @@ Original source code, tests, build scripts and original documentation are under 
 
 The workspace uses Tk's bundled `clam` theme and standard-library Windows APIs. Native file pickers and message dialogs follow OS styling; unsupported systems may keep a light title bar. Large text/high-DPI settings, clean-machine executable releases and browser associations need release-time checks. The fixed dark workspace does not automatically follow OS high-contrast preferences.
 
-See [RUNTIME_SECURITY.md](RUNTIME_SECURITY.md) for the dated native-library/advisory review and [RELEASE_READINESS.md](RELEASE_READINESS.md) for exact artifact identities and performed checks. A separate Windows 10 laptop successfully processed 10 real MP3s in the previous 1.2.6 build, as reported by its owner. Its occasionally light title bar until focus is a cosmetic limitation. Version 1.3.0 adds the output-choice/replacement workflow and requires fresh packaged checks; the report distinguishes those builds.
+See [RUNTIME_SECURITY.md](RUNTIME_SECURITY.md) for the dated native-library/advisory review and [RELEASE_READINESS.md](RELEASE_READINESS.md) for exact artifact identities and performed checks. A separate Windows 10 laptop successfully processed 10 real MP3s in the previous 1.2.6 build, as reported by its owner. Its occasionally light title bar until focus is a cosmetic limitation. Version 1.3.0 added the output-choice/replacement workflow; 1.3.1 adds website-link attribution and requires fresh packaged checks; the report distinguishes those builds.
 
 See [CHANGELOG.md](CHANGELOG.md) for version history. This standalone utility contains no commercial BinauraWave application code.

@@ -6,7 +6,10 @@ RUN
 Extract this ZIP to any normal folder, then double-click
 BinauraWave-Audio-Asset-Namer.exe. No installation, Python, pip or other
 dependencies are needed. The utility works offline; only clicking a website
-link opens your default browser. Allow a moment for first startup.
+link opens your default browser. The three BinauraWave website links include
+campaign attribution (asset-namer / desktop_app / free_creator_tools);
+GitHub is unchanged. No analytics SDK or background tracking is added.
+Allow a moment for first startup.
 
 USE
 1. Select the folder containing your numbered Audacity MP3 exports.

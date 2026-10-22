@@ -272,6 +272,58 @@ class NamingTests(unittest.TestCase):
         self.assertTrue((self.folder / "Named" / core.filename(plan.clips[0])).is_file())
 
 
+class WebsiteLinkTests(unittest.TestCase):
+    def test_footer_destinations_and_exact_campaign_parameters(self):
+        import app
+        from urllib.parse import parse_qsl, urlsplit
+        expected = {
+            "BinauraWave": "https://binaurawave.com/",
+            "Create Audio Sessions": "https://binaurawave.com/binaurawave_app/",
+            "Help & Support": "https://binaurawave.com/feedback/",
+        }
+        tracking = [("utm_source", "asset-namer"), ("utm_medium", "desktop_app"),
+                    ("utm_campaign", "free_creator_tools")]
+        self.assertEqual(len(app.FOOTER_LINKS), 3)
+        for label, url in app.FOOTER_LINKS:
+            parts = urlsplit(url)
+            self.assertEqual(parts._replace(query="").geturl(), expected[label])
+            self.assertEqual(parse_qsl(parts.query), tracking)
+        self.assertEqual(app.GITHUB_URL, "https://github.com/cmderdanblackburno7/audio_asset_namer")
+        self.assertEqual(urlsplit(app.GITHUB_URL).query, "")
+
+    def test_query_encoding_existing_values_and_fragment(self):
+        import app
+        from urllib.parse import parse_qsl, urlsplit
+        url = "https://binaurawave.com/feedback/?q=calm%20%26%20caf%C3%A9&empty=&tag=a&tag=b&utm_source=old&utm_source=duplicate&utm_campaign=old#help"
+        result = app.website_link(url)
+        parts = urlsplit(result)
+        self.assertEqual((parts.scheme, parts.netloc, parts.path, parts.fragment),
+                         ("https", "binaurawave.com", "/feedback/", "help"))
+        self.assertEqual(parse_qsl(parts.query, keep_blank_values=True),
+                         [("q", "calm & café"), ("empty", ""), ("tag", "a"), ("tag", "b"),
+                          ("utm_source", "asset-namer"), ("utm_medium", "desktop_app"),
+                          ("utm_campaign", "free_creator_tools")])
+        self.assertNotIn(" ", result)
+        self.assertIn("%26", result)
+        self.assertIn("%C3%A9", result)
+        self.assertEqual(app.website_link(result), result)
+
+    def test_urls_are_local_until_explicit_open_and_browser_fallback(self):
+        import app
+        from types import SimpleNamespace
+        ui = SimpleNamespace(root=None)
+        with patch.object(app.webbrowser, "open", return_value=True) as browser:
+            urls = [app.website_link(url) for _, url in app.FOOTER_LINKS]
+            browser.assert_not_called()
+            for url in (*urls, app.GITHUB_URL):
+                app.App.open_link(ui, url)
+                browser.assert_called_with(url, new=2)
+            self.assertEqual(browser.call_count, 4)
+        with patch.object(app.webbrowser, "open", return_value=False), patch.object(app.messagebox, "showinfo") as info:
+            app.App.open_link(ui, urls[0])
+            self.assertIn(urls[0], info.call_args.args[1])
+
+
 class WindowsBrandingTests(unittest.TestCase):
     def test_resource_paths_use_module_location_in_source_and_bundle(self):
         self.assertEqual(windows_branding.asset_path("favicon.ico"), TOOL / "favicon.ico")

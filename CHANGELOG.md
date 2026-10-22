@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.3.1 — 2026-10-22
+
+- Add consistent UTM query parameters to the three existing BinauraWave footer destinations using standard-library URL parsing and encoding. GitHub and browser-opening behaviour are unchanged.
+- Add regressions for exact destinations/parameters, existing query values, encoding, fragments, idempotence, explicit opening and browser fallback.
+- No telemetry SDK, cookies, background requests, audio/export or UI-layout changes. Rebuild the Windows EXE/ZIP and checksums; no publication or push.
+
 ## 1.3.0 — 2026-10-22
 
 - Offer Choose another folder / Replace existing exports / Cancel when Named exists, with safe keyboard defaults and full-path confirmation.

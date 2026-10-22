@@ -4,6 +4,7 @@ import threading
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
 import webbrowser
+from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 from core import VERSION, export_plan, filename, load_plan, validate_titles
 from exporting import exists, prepare_export
@@ -11,10 +12,26 @@ from theme import COLORS, apply_theme
 from windows_branding import apply_window_branding, asset_path, set_app_id
 
 WEBSITE = "https://binaurawave.com/"
+UTM_PARAMETERS = (
+    ("utm_source", "asset-namer"),
+    ("utm_medium", "desktop_app"),
+    ("utm_campaign", "free_creator_tools"),
+)
+
+
+def website_link(url):
+    """Add campaign attribution locally; opening remains an explicit UI action."""
+    parts = urlsplit(url)
+    keys = {key for key, _ in UTM_PARAMETERS}
+    query = [(key, value) for key, value in parse_qsl(parts.query, keep_blank_values=True)
+             if key not in keys]
+    return urlunsplit(parts._replace(query=urlencode(query + list(UTM_PARAMETERS))))
+
+
 FOOTER_LINKS = (
-    ("BinauraWave", WEBSITE),
-    ("Create Audio Sessions", WEBSITE + "binaurawave_app/"),
-    ("Help & Support", WEBSITE + "feedback/"),
+    ("BinauraWave", website_link(WEBSITE)),
+    ("Create Audio Sessions", website_link(WEBSITE + "binaurawave_app/")),
+    ("Help & Support", website_link(WEBSITE + "feedback/")),
 )
 # Verified public repository; opened only on an explicit footer click.
 GITHUB_URL = "https://github.com/cmderdanblackburno7/audio_asset_namer"
