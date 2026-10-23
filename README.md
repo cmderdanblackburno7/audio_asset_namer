@@ -137,7 +137,16 @@ Tests and fixtures are included here and need no other repository, credentials, 
 - [Help & Support](https://binaurawave.com/feedback/)
 - [GitHub source and issues](https://github.com/cmderdanblackburno7/audio_asset_namer)
 
+
 All four footer links are optional and open only when clicked; they cause no startup requests. The three BinauraWave website links include `utm_source=asset-namer`, `utm_medium=desktop_app` and `utm_campaign=free_creator_tools` for website attribution. GitHub is unchanged. These query parameters are sent to the website only when you open a link; no analytics SDK, cookies or background tracking is added to the desktop app. Report ordinary bugs through [GitHub Issues](https://github.com/cmderdanblackburno7/audio_asset_namer/issues), with the version, Windows version, redacted error text and a tiny synthetic example. For security concerns, see [SECURITY.md](SECURITY.md) and contact support before posting sensitive details publicly. Do not send personal audio, full scripts, passwords, API keys or unredacted local file paths.
+
+## Video Demonstration
+
+See how to split audio recordings in Audacity and
+automatically rename the resulting files with
+BinauraWave Audio Asset Namer.
+
+[![Watch demonstration](https://img.youtube.com/vi/eT6hSekWv2g/hqdefault.jpg)](https://www.youtube.com/watch?v=eT6hSekWv2g)
 
 ## Licence, branding and limitations
 
